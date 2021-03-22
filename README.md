@@ -18,6 +18,8 @@ Extension classes to .NET Standard 2.0.
 - public int Count { get; }: gets the number of items contained in the FrequencyTable<T>
 - public IEnumerable<int> Frequencies { get; }: gets a collection containing the frequencies of all items contained in the FrequencyTable<T>
 - public IEnumerable<T> Items { get; }: gets a collection containing all items contained in the FrequencyTable<T>
+- public int MaxFrequency { get; }: gets the maximum of frequency of all items contained in the FrequencyTable<T>
+- public int MinFrequency { get; }: gets the minimum of frequency of all items contained in the FrequencyTable<T>
 - public T this[int frequency] { get; set; }: gets or sets the frequency of the specified item
 
 #### Methods

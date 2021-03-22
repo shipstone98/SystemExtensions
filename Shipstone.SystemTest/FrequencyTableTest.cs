@@ -18,6 +18,31 @@ namespace Shipstone.SystemTest
 
         static FrequencyTableTest() => FrequencyTableTest._Random = new();
 
+        private static void _GetMaxMin(Dictionary<int, int> dictionary, out int min, out int max)
+        {
+            if (dictionary.Count == 0)
+            {
+                max = min = 0;
+                return;
+            }
+
+            min = Int32.MaxValue;
+            max = 0;
+
+            foreach (int val in dictionary.Values)
+            {
+                if (val < min)
+                {
+                    min = val;
+                }
+
+                if (val > max)
+                {
+                    max = val;
+                }
+            }
+        }
+
         private static int[] _Sample() => FrequencyTableTest._Sample(0, Int32.MaxValue);
         private static int[] _Sample(out Dictionary<int, int> dictionary) => FrequencyTableTest._Sample(0, Int32.MaxValue, out dictionary);
         private static int[] _Sample(int min, int max) => FrequencyTableTest._Sample(min, max, out Dictionary<int, int> dictionary);
@@ -70,6 +95,8 @@ namespace Shipstone.SystemTest
             Assert.IsTrue(this._Table.Items.Contains(CONSTANT));
             Assert.AreEqual(CONSTANT, this._Table[CONTROL]);
             Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            Assert.AreEqual(CONSTANT, this._Table.MaxFrequency);
+            Assert.AreEqual(CONSTANT, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -86,6 +113,8 @@ namespace Shipstone.SystemTest
             Assert.IsTrue(this._Table.Items.Contains(CONSTANT));
             Assert.AreEqual(0, this._Table[CONTROL]);
             Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            Assert.AreEqual(CONSTANT, this._Table.MaxFrequency);
+            Assert.AreEqual(CONSTANT, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -101,6 +130,18 @@ namespace Shipstone.SystemTest
             Assert.IsTrue(this._Table.Items.Contains(CONSTANT));
             Assert.AreEqual(CONTROL, this._Table[CONTROL]);
             Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            
+            if (CONTROL < CONSTANT)
+            {
+                Assert.AreEqual(CONSTANT, this._Table.MaxFrequency);
+                Assert.AreEqual(CONTROL, this._Table.MinFrequency);
+            }
+
+            else
+            {
+                Assert.AreEqual(CONTROL, this._Table.MaxFrequency);
+                Assert.AreEqual(CONSTANT, this._Table.MinFrequency);
+            }
         }
 
         [TestMethod]
@@ -116,6 +157,8 @@ namespace Shipstone.SystemTest
             Assert.IsTrue(this._Table.Items.Contains(CONSTANT));
             Assert.AreEqual(0, this._Table[CONTROL]);
             Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            Assert.AreEqual(CONSTANT, this._Table.MaxFrequency);
+            Assert.AreEqual(CONSTANT, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -129,6 +172,8 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(1, this._Table.Items.Count());
             Assert.IsTrue(this._Table.Items.Contains(ITEM));
             Assert.AreEqual(FREQ_2, this._Table[ITEM]);
+            Assert.AreEqual(FREQ_2, this._Table.MaxFrequency);
+            Assert.AreEqual(FREQ_2, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -142,6 +187,8 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(0, this._Table.Items.Count());
             Assert.IsFalse(this._Table.Items.Contains(ITEM_1));
             Assert.AreEqual(0, this._Table[ITEM_1]);
+            Assert.AreEqual(0, this._Table.MaxFrequency);
+            Assert.AreEqual(0, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -154,6 +201,8 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(1, this._Table.Items.Count());
             Assert.IsTrue(this._Table.Items.Contains(ITEM));
             Assert.AreEqual(ITEM, this._Table[ITEM]);
+            Assert.AreEqual(ITEM, this._Table.MaxFrequency);
+            Assert.AreEqual(ITEM, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -166,17 +215,29 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(0, this._Table.Items.Count());
             Assert.IsFalse(this._Table.Items.Contains(ITEM));
             Assert.AreEqual(0, this._Table[ITEM]);
+            Assert.AreEqual(0, this._Table.MaxFrequency);
+            Assert.AreEqual(0, this._Table.MinFrequency);
         }
 #endregion
 
 #region Constructor tests
         [TestMethod]
+        public void TestConstructor()
+        {
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.IsNotNull(this._Table.Frequencies);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.IsNotNull(this._Table.Items);
+            Assert.AreEqual(0, this._Table.Items.Count());
+            Assert.AreEqual(0, this._Table.MaxFrequency);
+            Assert.AreEqual(0, this._Table.MinFrequency);
+        }
+
+        [TestMethod]
         public void TestConstructor_IEnumerable_Empty()
         {
             this._Table = new(Array.Empty<int>());
-            Assert.AreEqual(0, this._Table.Count);
-            Assert.AreEqual(0, this._Table.Frequencies.Count());
-            Assert.AreEqual(0, this._Table.Items.Count());
+            this.TestConstructor();
         }
 
         [TestMethod]
@@ -192,6 +253,10 @@ namespace Shipstone.SystemTest
                 Assert.IsTrue(this._Table.Items.Contains(n));
                 Assert.AreEqual(dictionary[n], this._Table[n]);
             }
+
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            Assert.AreEqual(max, this._Table.MaxFrequency);
+            Assert.AreEqual(min, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -201,9 +266,7 @@ namespace Shipstone.SystemTest
         public void TestConstructor_FrequencyTable_Empty()
         {
             this._Table = new(this._Table);
-            Assert.AreEqual(0, this._Table.Count);
-            Assert.AreEqual(0, this._Table.Frequencies.Count());
-            Assert.AreEqual(0, this._Table.Items.Count());
+            this.TestConstructor();
         }
 
         [TestMethod]
@@ -226,6 +289,10 @@ namespace Shipstone.SystemTest
             {
                 Assert.IsTrue(this._Table.Frequencies.Contains(frequency));
             }
+
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            Assert.AreEqual(max, this._Table.MaxFrequency);
+            Assert.AreEqual(min, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -237,9 +304,7 @@ namespace Shipstone.SystemTest
         public void TestClear_Empty()
         {
             this._Table.Clear();
-            Assert.AreEqual(0, this._Table.Count);
-            Assert.AreEqual(0, this._Table.Frequencies.Count());
-            Assert.AreEqual(0, this._Table.Items.Count());
+            this.TestConstructor();
         }
 
         [TestMethod]
@@ -248,9 +313,7 @@ namespace Shipstone.SystemTest
             int[] sample = FrequencyTableTest._Sample();
             this._Table = new(sample);
             this._Table.Clear();
-            Assert.AreEqual(0, this._Table.Count);
-            Assert.AreEqual(0, this._Table.Frequencies.Count());
-            Assert.AreEqual(0, this._Table.Items.Count());
+            this.TestConstructor();
         }
 
         [TestMethod]
@@ -259,9 +322,7 @@ namespace Shipstone.SystemTest
             const int CONSTANT = 10;
             this._Table[CONSTANT] = CONSTANT;
             this._Table.Clear();
-            Assert.AreEqual(0, this._Table.Count);
-            Assert.AreEqual(0, this._Table.Frequencies.Count());
-            Assert.AreEqual(0, this._Table.Items.Count());
+            this.TestConstructor();
         }
 #endregion
 
@@ -270,9 +331,7 @@ namespace Shipstone.SystemTest
         public void TestContains_Empty()
         {
             Assert.IsFalse(this._Table.Contains(10));
-            Assert.AreEqual(0, this._Table.Count);
-            Assert.AreEqual(0, this._Table.Frequencies.Count());
-            Assert.AreEqual(0, this._Table.Items.Count());
+            this.TestConstructor();
         }
 
         [TestMethod]
@@ -289,6 +348,9 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(sample.Length, this._Table.Count);
             Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
             Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            Assert.AreEqual(max, this._Table.MaxFrequency);
+            Assert.AreEqual(min, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -301,6 +363,9 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(sample.Length, this._Table.Count);
             Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
             Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            Assert.AreEqual(max, this._Table.MaxFrequency);
+            Assert.AreEqual(min, this._Table.MinFrequency);
         }
 #endregion
 
@@ -313,6 +378,7 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(0, this._Table.Count);
             Assert.AreEqual(0, this._Table.Frequencies.Count());
             Assert.AreEqual(0, this._Table.Items.Count());
+            this.TestConstructor();
         }
 
         [TestMethod]
@@ -329,6 +395,9 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(sample.Length, this._Table.Count);
             Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
             Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            Assert.AreEqual(max, this._Table.MaxFrequency);
+            Assert.AreEqual(min, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -349,6 +418,9 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(sample.Length, this._Table.Count);
             Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
             Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            Assert.AreEqual(max, this._Table.MaxFrequency);
+            Assert.AreEqual(min, this._Table.MinFrequency);
         }
 
         [TestMethod]
@@ -361,6 +433,9 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(MAX, this._Table.Count);
             Assert.AreEqual(1, this._Table.Frequencies.Count());
             Assert.AreEqual(1, this._Table.Items.Count());
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            Assert.AreEqual(MAX, this._Table.MaxFrequency);
+            Assert.AreEqual(MAX, this._Table.MinFrequency);
         }
 
         [TestMethod]

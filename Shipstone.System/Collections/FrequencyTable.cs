@@ -13,6 +13,8 @@ namespace Shipstone.System.Collections
         private int _Count;
         private readonly IList<int> _Frequencies;
         private readonly IList<T> _Items;
+        private int _MaxFrequency;
+        private int _MinFrequency;
 
 #region Properties
         /// <summary>
@@ -36,8 +38,18 @@ namespace Shipstone.System.Collections
         /// <value>A collection containing all items contained in the <see cref="FrequencyTable{T}" />.</value>
         public IEnumerable<T> Items => this._Items;
 
-        public int MaxFrequency => throw new NotImplementedException();
-        public int MinFrequency => throw new NotImplementedException();
+        /// <summary>
+        /// Gets the maximum of frequency of all items contained in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <value>The maximum of frequency of all items contained in the <see cref="FrequencyTable{T}" />, or 0 (zero) if the table is empty.</value>
+        public int MaxFrequency => this._MaxFrequency;
+
+        /// <summary>
+        /// Gets the minimum of frequency of all items contained in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <value>The minimum of frequency of all items contained in the <see cref="FrequencyTable{T}" />, or 0 (zero) if the table is empty.</value>
+        public int MinFrequency => this._MinFrequency;
+
         Object ICollection.SyncRoot => this;
 
         /// <summary>
@@ -92,6 +104,8 @@ namespace Shipstone.System.Collections
                         this._Count += value - frequency;
                     }
                 }
+
+                this._ResetMaxMin();
             }
         }
 #endregion
@@ -117,6 +131,8 @@ namespace Shipstone.System.Collections
             {
                 this._Add(item, 1);
             }
+
+            this._ResetMaxMin();
         }
 
         /// <summary>
@@ -134,6 +150,8 @@ namespace Shipstone.System.Collections
             this._Count = table._Count;
             this._Frequencies = new List<int>(table._Frequencies);
             this._Items = new List<T>(table._Items);
+            this._MaxFrequency = table._MaxFrequency;
+            this._MinFrequency = table._MinFrequency;
         }
 #endregion
 
@@ -155,6 +173,31 @@ namespace Shipstone.System.Collections
 
             this._Count += frequency;
         }
+
+        private void _ResetMaxMin()
+        {
+            if (this._Count == 0)
+            {
+                this._MaxFrequency = this._MinFrequency = 0;
+                return;
+            }
+
+            this._MinFrequency = Int32.MaxValue;
+            this._MaxFrequency = 0;
+
+            foreach (int frequency in this._Frequencies)
+            {
+                if (frequency < this._MinFrequency)
+                {
+                    this._MinFrequency = frequency;
+                }
+
+                if (frequency > this._MaxFrequency)
+                {
+                    this._MaxFrequency = frequency;
+                }
+            }
+        }
 #endregion
 
 #region Public methods
@@ -167,7 +210,7 @@ namespace Shipstone.System.Collections
         /// </summary>
         public void Clear()
         {
-            this._Count = 0;
+            this._Count = this._MaxFrequency = this._MinFrequency = 0;
             this._Frequencies.Clear();
             this._Items.Clear();
         }
