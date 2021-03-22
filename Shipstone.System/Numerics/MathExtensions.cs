@@ -10,10 +10,12 @@ namespace Shipstone.System.Numerics
     /// </summary>
     public static class MathExtensions
     {
-        private static double _Mean(IEnumerable<double> collection)
+        private static double _Mean(IEnumerable<double> collection) => MathExtensions._Mean(collection, out int n);
+
+        private static double _Mean(IEnumerable<double> collection, out int n)
         {
             double sum = 0;
-            int n = 0;
+            n = 0;
 
             foreach (double item in collection)
             {
@@ -54,6 +56,68 @@ namespace Shipstone.System.Numerics
         {
             FrequencyTable<double> table = new FrequencyTable<double>(collection);
             return table.Count == 0 ? 0 : MathExtensions._Mean(table.GetMax());
+        }
+
+        /// <summary>
+        /// Calculates the population variance of values in the specified collection.
+        /// </summary>
+        /// <param name="collection">An <see cref="IEnumerable{T}" /> of values to calculate the population variance from.</param>
+        /// <returns>The population variance of values in the <c><paramref name="collection" /></c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public static double Variance(IEnumerable<double> collection) => MathExtensions.Variance(collection, out double mean);
+
+        /// <summary>
+        /// Calculates the population variance of values in the specified collection using the pre-calculated mean. You should only use this method if the mean is known.
+        /// </summary>
+        /// <param name="collection">An <see cref="IEnumerable{T}" /> of values to calculate the population variance from.</param>
+        /// <param name="mean">The pre-calculated mean average of <c><paramref name="collection" /></c>. If the value is inaccurate, the result will be incorrect.</param>
+        /// <returns>The population variance of values in the <c><paramref name="collection" /></c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public static double Variance(IEnumerable<double> collection, double mean)
+        {
+            if (collection is null)
+            {
+                throw new ArgumentNullException(nameof (collection));
+            }
+
+            double sum = 0;
+            int n = 0;
+
+            foreach (double item in collection)
+            {
+                double diff = item - mean;
+                sum += diff * diff;
+                ++ n;
+            }
+
+            return n == 0 ? 0 : sum / n;
+        }
+
+        /// <summary>
+        /// Calculates the population variance of values in the specified collection.
+        /// </summary>
+        /// <param name="collection">An <see cref="IEnumerable{T}" /> of values to calculate the population variance from.</param>
+        /// <param name="mean">The mean average of values in the <c><paramref name="collection" /></c>. This parameter is passed uninitialized.</param>
+        /// <returns>The population variance of values in the <c><paramref name="collection" /></c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public static double Variance(IEnumerable<double> collection, out double mean)
+        {
+            mean = MathExtensions._Mean(collection ?? throw new ArgumentNullException(nameof (collection)), out int n);
+
+            if (n == 0)
+            {
+                return 0;
+            }
+
+            double sum = 0;
+
+            foreach (double item in collection)
+            {
+                double diff = item - mean;
+                sum += diff * diff;
+            }
+
+            return sum / n;
         }
     }
 }

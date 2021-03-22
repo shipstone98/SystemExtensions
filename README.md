@@ -69,3 +69,6 @@ Extension classes to .NET Standard 2.0.
 - public static double Mean(IEnumerable<double> collection): calculates the mean average of values in the specified collection
 - public static double Mean(IEnumerable<double> collection): calculates the median average of values in the specified sorted collection
 - public static double Mode(IEnumerable<double> collection): calculates the modal average of values in the specified collection
+- public static double Variance(IEnumerable<double> collection): calculates the population variance of values in the specified collection
+- public static double Variance(IEnumerable<double> collection, double mean): calculates the population variance of values in the specified collection using the pre-calculated mean
+- public static double Variance(IEnumerable<double> collection, out double mean): calculates the population variance of values in the specified collection
