@@ -13,6 +13,7 @@ Extension classes to .NET Standard 2.0.
 - Add methods and Item property do not currently prevent frequency overflow - this will be fixed
 - No unit tests for null as item parameters (currently only testing value types)
 - CopyTo and ToArray tests not yet fully implemented
+- GetEnumerator modify tests could be strengthened to test every non-const method
 
 #### Constructors
 - public FrequencyTable(): initializes a new instance of the FrequencyTable<T> class that is empty
@@ -43,6 +44,7 @@ Extension classes to .NET Standard 2.0.
 - public IEnumerable<T> GetMin(): creates a shallow copy of all items with the minimum frequency in the source
 - public bool Remove(T item): removes an item from the FrequencyTable<T>
 - public bool Remove(T item, int frequency): decreases the frequency of the specified item in the FrequencyTable<T>
+- public void Swap(T a, T b): swaps the frequencies of the two specified items in the FrequencyTable<T>
 - public T[] ToArray(): copies the items of the FrequencyTable<T> to a new array
 - public T[] ToArray(int frequency): copies a range of items of the FrequencyTable<T> with the specified frequency to a new array
 - public T[] ToArray(int minFrequency, int maxFrequency): copies a range of items of the FrequencyTable<T> within the specified inclusive frequency range to a new array

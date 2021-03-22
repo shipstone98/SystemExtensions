@@ -603,7 +603,39 @@ namespace Shipstone.System.Collections
         public int RemoveRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
 #endregion
 
-        public void Swap(T a, T b) => throw new NotImplementedException();
+        /// <summary>
+        /// Swaps the frequencies of the two specified items in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="a">The first item two swap.</param>
+        /// <param name="b">The second item two swap.</param>
+        public void Swap(T a, T b)
+        {
+            int aIndex = this._Items.IndexOf(a), bIndex = this._Items.IndexOf(b);
+
+            if (aIndex == bIndex)
+            {
+                return;
+            }
+            
+            if (aIndex == -1)
+            {
+                this._Items[bIndex] = a;
+            }
+
+            else if (bIndex == -1)
+            {
+                this._Items[aIndex] = b;
+            }
+
+            else
+            {
+                int temp = this._Frequencies[aIndex];
+                this._Frequencies[aIndex] = this._Frequencies[bIndex];
+                this._Frequencies[bIndex] = temp;
+            }
+
+            this._NotifyEnumerators();
+        }
 
         /// <summary>
         /// Copies the items of the <see cref="FrequencyTable{T}" /> to a new array.

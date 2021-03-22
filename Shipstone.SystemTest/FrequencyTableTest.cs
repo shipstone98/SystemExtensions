@@ -1006,6 +1006,57 @@ namespace Shipstone.SystemTest
 #endregion
 #endregion
 
+#region Swap tests
+        [TestMethod]
+        public void TestSwap_Empty()
+        {
+            const int A = 10, B = 20;
+            this._Table.Swap(A, B);
+            this._AssertProperties(0, 0, 0, 0);
+            Assert.AreEqual(0, this._Table[A]);
+            Assert.AreEqual(0, this._Table[B]);
+        }
+        
+        [TestMethod]
+        public void TestSwap_NotEmpty_ContainsBoth()
+        {
+            const int A = 10, B = 20, C = 30, D = 40;
+            this._Table[A] = A;
+            this._Table[B] = B;
+            this._Table[C] = C;
+            this._Table[D] = D;
+            this._Table.Swap(A, B);
+            this._AssertProperties(A + B + C + D, 4, A, D);
+            Assert.AreEqual(B, this._Table[A]);
+            Assert.AreEqual(A, this._Table[B]);
+        }
+        
+        [TestMethod]
+        public void TestSwap_NotEmpty_ContainsNeither()
+        {
+            const int A = 10, B = 20, C = 30, D = 40;
+            this._Table[C] = C;
+            this._Table[D] = D;
+            this._Table.Swap(A, B);
+            this._AssertProperties(C + D, 2, C, D);
+            Assert.AreEqual(0, this._Table[A]);
+            Assert.AreEqual(0, this._Table[B]);
+        }
+        
+        [TestMethod]
+        public void TestSwap_NotEmpty_ContainsOne()
+        {
+            const int A = 10, B = 20, C = 30, D = 40;
+            this._Table[B] = B;
+            this._Table[C] = C;
+            this._Table[D] = D;
+            this._Table.Swap(A, B);
+            this._AssertProperties(B + C + D, 3, B, D);
+            Assert.AreEqual(B, this._Table[A]);
+            Assert.AreEqual(0, this._Table[B]);
+        }
+#endregion
+
 #region ToArray tests
         [TestMethod]
         public void TestToArray_Empty()
