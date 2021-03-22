@@ -23,6 +23,9 @@ Extension classes to .NET Standard 2.0.
 - public T this[int frequency] { get; set; }: gets or sets the frequency of the specified item
 
 #### Methods
+- public void Add(T item): adds an item to the FrequencyTable<T>
+- public void Add(T item, int frequency): increases the frequency of the specified item in the FrequencyTable<T>
+- public void AddRange(IEnumerable<T> collection): adds the items of the specified collection to the FrequencyTable<T>
 - public void Clear(): removes all items from the FrequencyTable<T>
 - public bool Contains(T item): determines whether an item is in the FrequencyTable<T>
 - public bool ContainsAll(IEnumerable<T> collection): determines whether all items contained in the specified collection are in the FrequencyTable<T>

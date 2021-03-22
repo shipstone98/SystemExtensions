@@ -131,8 +131,6 @@ namespace Shipstone.System.Collections
             {
                 this._Add(item, 1);
             }
-
-            this._ResetMaxMin();
         }
 
         /// <summary>
@@ -172,6 +170,7 @@ namespace Shipstone.System.Collections
             }
 
             this._Count += frequency;
+            this._ResetMaxMin();
         }
 
         private void _ResetMaxMin()
@@ -201,9 +200,43 @@ namespace Shipstone.System.Collections
 #endregion
 
 #region Public methods
-        public void Add(T item) => throw new NotImplementedException();
-        public void Add(T item, int frequency) => throw new NotImplementedException();
-        public void AddRange(IEnumerable<T> collection) => throw new NotImplementedException();
+        /// <summary>
+        /// Adds an item to the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="item">The item to be added to the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
+        public void Add(T item) => this._Add(item, 1);
+
+        /// <summary>
+        /// Increases the frequency of the specified item in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="item">The item to increase the frequency of in the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
+        /// <param name="frequency">The frequency to increase the current frequency of <c><paramref name="item" /></c> by.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than 0.</exception>
+        public void Add(T item, int frequency)
+        {
+            if (frequency < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (frequency));
+            }
+
+            if (frequency > 0)
+            {
+                this._Add(item, frequency);
+            }
+        }
+
+        /// <summary>
+        /// Adds the items of the specified collection to the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="collection">The collection whose items should be added to the <see cref="FrequencyTable{T}" />. The collection itself cannot be <c>null</c>, but it can contain items that are <c>null</c>, if <c><typeparamref name="T" /></c> is a reference type.</param>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public void AddRange(IEnumerable<T> collection)
+        {
+            foreach (T item in collection ?? throw new ArgumentNullException(nameof (collection)))
+            {
+                this._Add(item, 1);
+            }
+        }
 
         /// <summary>
         /// Removes all items from the <see cref="FrequencyTable{T}" />.
