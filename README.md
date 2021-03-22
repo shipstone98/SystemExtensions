@@ -4,9 +4,10 @@ Extension classes to .NET Standard 2.0.
 
 ## Namespaces
 - Shipstone.System.Collections: contains classes that define generic collections, which allows users to create strongly typed collections that provide better type safety and performance than non-generic strongly typed collections
+- Shipstone.System.Numerics: contains numeric and mathematical types that complement the numeric primitives, such as Byte, Double and Int32, that are defined by .NET
 
 ## Shipstone.System.Collections
-- FrequencyTable<T>: represents a strongly types frequency table of items
+- public class FrequencyTable<T>: represents a strongly types frequency table of items
 
 ### FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
 #### Remarks
@@ -54,3 +55,10 @@ Extension classes to .NET Standard 2.0.
 - Object ICollection.SyncRoot
 - bool ICollection<T>.IsReadOnly
 - IEnumerator IEnumerable.GetEnumerator()
+
+## Shipstone.System.Numerics
+- public static class MathExtensions: provides static methods for common mathematical and statistical functions
+
+### MathExtensions
+#### Methods
+- public static double Mean(IEnumerable<double> collection): calculates the mean average of values in the specified collection
