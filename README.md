@@ -29,6 +29,8 @@ Extension classes to .NET Standard 2.0.
 - public void Clear(): removes all items from the FrequencyTable<T>
 - public bool Contains(T item): determines whether an item is in the FrequencyTable<T>
 - public bool ContainsAll(IEnumerable<T> collection): determines whether all items contained in the specified collection are in the FrequencyTable<T>
+- public IEnumerable<T> GetMax(): creates a shallow copy of all items with the maximum frequency in the source FrequencyTable<T>
+- public IEnumerable<T> GetMin(): creates a shallow copy of all items with the minimum frequency in the source
 
 #### Explicit Interface Implementations
 - bool ICollection.IsSynchronized

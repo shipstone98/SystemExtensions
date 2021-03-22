@@ -530,5 +530,95 @@ namespace Shipstone.SystemTest
         [TestMethod]
         public void TestContainsAll_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.ContainsAll(null));
 #endregion
+
+#region Get Range functionality
+#region GetMax tests
+        [TestMethod]
+        public void TestGetMax_Empty()
+        {
+            Exception ex = Assert.ThrowsException<InvalidOperationException>(() => this._Table.GetMax());
+            Assert.AreEqual("The FrequencyTable<T> is empty.", ex.Message);
+        }
+
+        [TestMethod]
+        public void TestGetMax_NotEmpty()
+        {
+            int[] sample = FrequencyTableTest._Sample(1, 10, out Dictionary<int, int> dictionary);
+            this._Table.AddRange(sample);
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            ICollection<int> dictionaryMaxCollection = new List<int>();
+
+            foreach (KeyValuePair<int, int> keyValuePair in dictionary)
+            {
+                if (keyValuePair.Value == max)
+                {
+                    dictionaryMaxCollection.Add(keyValuePair.Key);
+                }
+            }
+
+            IEnumerable<int> maxCollection = this._Table.GetMax();
+            ICollection<int> maxRemaining = new LinkedList<int>(maxCollection);
+            Assert.AreEqual(dictionaryMaxCollection.Count, maxRemaining.Count);
+
+            foreach (int item in dictionaryMaxCollection)
+            {
+                Assert.IsTrue(maxRemaining.Remove(item));
+            }
+
+            Assert.AreEqual(0, maxRemaining.Count);
+
+            foreach (int item in maxCollection)
+            {
+                Assert.IsTrue(dictionaryMaxCollection.Remove(item));
+            }
+
+            Assert.AreEqual(0, dictionaryMaxCollection.Count);
+        }
+#endregion
+
+#region GetMin tests
+        [TestMethod]
+        public void TestGetMin_Empty()
+        {
+            Exception ex = Assert.ThrowsException<InvalidOperationException>(() => this._Table.GetMin());
+            Assert.AreEqual("The FrequencyTable<T> is empty.", ex.Message);
+        }
+
+        [TestMethod]
+        public void TestGetMin_NotEmpty()
+        {
+            int[] sample = FrequencyTableTest._Sample(1, 10, out Dictionary<int, int> dictionary);
+            this._Table.AddRange(sample);
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            ICollection<int> dictionaryMinCollection = new List<int>();
+
+            foreach (KeyValuePair<int, int> keyValuePair in dictionary)
+            {
+                if (keyValuePair.Value == min)
+                {
+                    dictionaryMinCollection.Add(keyValuePair.Key);
+                }
+            }
+
+            IEnumerable<int> minCollection = this._Table.GetMin();
+            ICollection<int> minRemaining = new LinkedList<int>(minCollection);
+            Assert.AreEqual(dictionaryMinCollection.Count, minRemaining.Count);
+
+            foreach (int item in dictionaryMinCollection)
+            {
+                Assert.IsTrue(minRemaining.Remove(item));
+            }
+
+            Assert.AreEqual(0, minRemaining.Count);
+
+            foreach (int item in minCollection)
+            {
+                Assert.IsTrue(dictionaryMinCollection.Remove(item));
+            }
+
+            Assert.AreEqual(0, dictionaryMinCollection.Count);
+        }
+#endregion
+#endregion
     }
 }

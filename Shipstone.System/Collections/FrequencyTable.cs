@@ -10,6 +10,8 @@ namespace Shipstone.System.Collections
     /// <typeparam name="T">The type of items in the list.</typeparam>
     public partial class FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
     {
+        private const String _ClassName = "FrequencyTable<T>";
+
         private int _Count;
         private readonly IList<int> _Frequencies;
         private readonly IList<T> _Items;
@@ -296,8 +298,57 @@ namespace Shipstone.System.Collections
         public void ForEach(Action<T> action, int minFrequency, int maxFrequency) => throw new NotImplementedException();
         public IEnumerator<T> GetEnumerator() => throw new NotImplementedException();
         IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
-        public IEnumerable<T> GetMax() => throw new NotImplementedException();
-        public IEnumerable<T> GetMin() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Creates a shallow copy of all items with the maximum frequency in the source <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <returns>A shallow copy of all items with the maximum frequency in the source <see cref="FrequencyTable{T}" />.</returns>
+        /// <exception cref="InvalidOperationException">The <see cref="FrequencyTable{T}" /> is empty.</exception>
+        public IEnumerable<T> GetMax()
+        {
+            if (this._Count == 0)
+            {
+                throw new InvalidOperationException($"The {FrequencyTable<T>._ClassName} is empty.");
+            }
+
+            ICollection<T> max = new List<T>();
+            
+            for (int i = 0; i < this._Items.Count; i ++)
+            {
+                if (this._Frequencies[i] == this._MaxFrequency)
+                {
+                    max.Add(this._Items[i]);
+                }
+            }
+
+            return max;
+        }
+
+        /// <summary>
+        /// Creates a shallow copy of all items with the minimum frequency in the source <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <returns>A shallow copy of all items with the minimum frequency in the source <see cref="FrequencyTable{T}" />.</returns>
+        /// <exception cref="InvalidOperationException">The <see cref="FrequencyTable{T}" /> is empty.</exception>
+        public IEnumerable<T> GetMin()
+        {
+            if (this._Count == 0)
+            {
+                throw new InvalidOperationException($"The {FrequencyTable<T>._ClassName} is empty.");
+            }
+
+            ICollection<T> min = new List<T>();
+            
+            for (int i = 0; i < this._Items.Count; i ++)
+            {
+                if (this._Frequencies[i] == this._MinFrequency)
+                {
+                    min.Add(this._Items[i]);
+                }
+            }
+
+            return min;
+        }
+
         public IEnumerable<T> GetRange(int frequency) => throw new NotImplementedException();
         public IEnumerable<T> GetRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
         public bool Remove(T item) => throw new NotImplementedException();
