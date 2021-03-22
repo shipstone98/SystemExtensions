@@ -175,6 +175,43 @@ namespace Shipstone.System.Collections
             this._ResetMaxMin();
         }
 
+        private void _CopyTo(T[] array, int arrayIndex, int minFrequency, int maxFrequency)
+        {
+            for (int i = 0; i < this._Items.Count; i ++)
+            {
+                int frequency = this._Frequencies[i];
+
+                if (frequency < minFrequency || frequency > maxFrequency)
+                {
+                    continue;
+                }
+
+                T item = this._Items[i];
+
+                for (int j = 0; j < frequency; j ++)
+                {
+                    array[arrayIndex ++] = item;
+                }
+            }
+        }
+
+        private int _GetItemCount(int minFrequency, int maxFrequency)
+        {
+            int sum = 0;
+
+            foreach (int frequency in this._Frequencies)
+            {
+                if (frequency < minFrequency || frequency > maxFrequency)
+                {
+                    continue;
+                }
+
+                sum += frequency;
+            }
+
+            return sum;
+        }
+
         private bool _Remove(T item, int frequency)
         {
             int index = this._Items.IndexOf(item);
@@ -232,6 +269,7 @@ namespace Shipstone.System.Collections
 #endregion
 
 #region Public methods
+#region Add functionality
         /// <summary>
         /// Adds an item to the <see cref="FrequencyTable{T}" />.
         /// </summary>
@@ -269,6 +307,7 @@ namespace Shipstone.System.Collections
                 this._Add(item, 1);
             }
         }
+#endregion
 
         /// <summary>
         /// Removes all items from the <see cref="FrequencyTable{T}" />.
@@ -306,14 +345,143 @@ namespace Shipstone.System.Collections
             return true;
         }
 
-        public void CopyTo(T[] array) => throw new NotImplementedException();
-        public void CopyTo(T[] array, int arrayIndex) => throw new NotImplementedException();
-        public void CopyTo(T[] array, int arrayIndex, int frequency) =>  throw new NotImplementedException();
-        public void CopyTo(T[] array, int arrayIndex, int minFrequency, int maxFrequency) => throw new NotImplementedException();
+#region CopyTo methods
+        /// <summary>
+        /// Copies the entire <see cref="FrequencyTable{T}" /> to a compatible one-dimensional array, starting at the beginning of the target array.
+        /// </summary>
+        /// <param name="array">The one dimensional <see cref="Array" /> that is the destination of the items copied from the <see cref="FrequencyTable{T}" />. The <see cref="Array" /> must have zero-based indexing.</param>
+        /// <exception cref="ArgumentException">The number of items in the source <see cref="FrequencyTable{T}" /> is greater than the number of items that the destination <c><paramref name="array" /></c> can contain.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="array" /></c> is <c>null</c>.</exception>
+        public void CopyTo(T[] array)
+        {
+            if (array is null)
+            {
+                throw new ArgumentNullException(nameof (array));
+            }
+
+            if (array.Length < this._Count)
+            {
+                throw new ArgumentException($"The number of items in the source {FrequencyTable<T>._ClassName} is greater than the number of items that the destination {nameof (array)} can contain.");
+            }
+
+            this._CopyTo(array, 0, this._MinFrequency, this._MaxFrequency);
+        }
+
+        /// <summary>
+        /// Copies the entire <see cref="FrequencyTable{T}" /> to a compatible one-dimensional array, starting at the specified index of the target array.
+        /// </summary>
+        /// <param name="array">The one dimensional <see cref="Array" /> that is the destination of the items copied from the <see cref="FrequencyTable{T}" />. The <see cref="Array" /> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <c><paramref name="array" /></c> at which copying begins.</param>
+        /// <exception cref="ArgumentException">The number of items in the source <see cref="FrequencyTable{T}" /> is greater than the available space from <c><paramref name="arrayIndex" /></c> to the end of the destination <c><paramref name="array" /></c>.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="array" /></c> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="arrayIndex" /></c> is less than 0.</exception>
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            if (array is null)
+            {
+                throw new ArgumentNullException(nameof (array));
+            }
+
+            if (arrayIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (arrayIndex));
+            }
+
+            if (array.Length - arrayIndex < this._Count)
+            {
+                throw new ArgumentException($"The number of items in the source {FrequencyTable<T>._ClassName} is greater than the available space from {nameof (arrayIndex)} to the end of the destination {nameof (array)}.");
+            }
+
+            this._CopyTo(array, arrayIndex, this._MinFrequency, this._MaxFrequency);
+        }
+
+        /// <summary>
+        /// Copies the a range of items from the <see cref="FrequencyTable{T}" /> with the specified frequency to a compatible one-dimensional array, starting at the specified index of the target array.
+        /// </summary>
+        /// <param name="array">The one dimensional <see cref="Array" /> that is the destination of the items copied from the <see cref="FrequencyTable{T}" />. The <see cref="Array" /> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <c><paramref name="array" /></c> at which copying begins.</param>
+        /// <param name="frequency">The frequency of items to copy.</param>
+        /// <exception cref="ArgumentException">The number of items in the source <see cref="FrequencyTable{T}" /> with the specified frequency is greater than the available space from <c><paramref name="arrayIndex" /></c> to the end of the destination <c><paramref name="array" /></c>.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="array" /></c> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="arrayIndex" /></c> is less than 0 -or- <c><paramref name="frequency" /></c> is less than or equal to 0.</exception>
+        public void CopyTo(T[] array, int arrayIndex, int frequency)
+        {
+            if (array is null)
+            {
+                throw new ArgumentNullException(nameof (array));
+            }
+
+            if (arrayIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (arrayIndex));
+            }
+
+            if (frequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (frequency));
+            }
+
+            if (array.Length - arrayIndex < this._GetItemCount(frequency, frequency))
+            {
+                throw new ArgumentException($"The number of items in the source {FrequencyTable<T>._ClassName} with the specified frequency is greater than the available space from {nameof (arrayIndex)} to the end of the destination {nameof (array)}.");
+            }
+
+            this._CopyTo(array, arrayIndex, frequency, frequency);
+        }
+
+
+        /// <summary>
+        /// Copies the a range of items from the <see cref="FrequencyTable{T}" /> within the specified inclusive frequency range to a compatible one-dimensional array, starting at the specified index of the target array.
+        /// </summary>
+        /// <param name="array">The one dimensional <see cref="Array" /> that is the destination of the items copied from the <see cref="FrequencyTable{T}" />. The <see cref="Array" /> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <c><paramref name="array" /></c> at which copying begins.</param>
+        /// <param name="minFrequency">The minimum frequency of items to copy.</param>
+        /// <param name="maxFrequency">The maximum frequency of items to copy.</param>
+        /// <exception cref="ArgumentException"><c><paramref name="maxFrequency" /></c> is less than <c><paramref name="minFrequency" /></c> -or- the number of items in the source <see cref="FrequencyTable{T}" /> within the specified inclusive frequency range is greater than the available space from <c><paramref name="arrayIndex" /></c> to the end of the destination <c><paramref name="array" /></c>.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="array" /></c> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="arrayIndex" /></c> is less than 0 -or- <c><paramref name="minFrequency" /></c> is less than or equal to 0 -or- <c><paramref name="maxFrequency" /></c> is less than or equal to 0.</exception>
+        public void CopyTo(T[] array, int arrayIndex, int minFrequency, int maxFrequency)
+        {
+            if (array is null)
+            {
+                throw new ArgumentNullException(nameof (array));
+            }
+
+            if (arrayIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (arrayIndex));
+            }
+
+            if (minFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (minFrequency));
+            }
+
+            if (maxFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (maxFrequency));
+            }
+
+            if (maxFrequency < minFrequency)
+            {
+                throw new ArgumentException($"{nameof (maxFrequency)} is less than {nameof (minFrequency)}.");
+            }
+
+            if (array.Length - arrayIndex < this._GetItemCount(minFrequency, maxFrequency))
+            {
+                throw new ArgumentException($"The number of items in the source {FrequencyTable<T>._ClassName} within the specified inclusive frequency range is greater than the available space from {nameof (arrayIndex)} to the end of the destination {nameof (array)}.");
+            }
+
+            this._CopyTo(array, arrayIndex, minFrequency, maxFrequency);
+        }
+        
         public void CopyTo(Array array) => throw new NotImplementedException();
         public void CopyTo(Array array, int arrayIndex) => throw new NotImplementedException();
         public void CopyTo(Array array, int arrayIndex, int frequency) =>  throw new NotImplementedException();
         public void CopyTo(Array array, int arrayIndex, int minFrequency, int maxFrequency) => throw new NotImplementedException();
+#endregion
+
+#region Predicate functionality
         public bool Exists(Predicate<T> match) => throw new NotImplementedException();
         public bool Exists(Predicate<T> match, int frequency) => throw new NotImplementedException();
         public bool Exists(Predicate<T> match, int minFrequency, int maxFrequency) => throw new NotImplementedException();
@@ -326,9 +494,12 @@ namespace Shipstone.System.Collections
         public void ForEach(Action<T> action) => throw new NotImplementedException();
         public void ForEach(Action<T> action, int frequency) => throw new NotImplementedException();
         public void ForEach(Action<T> action, int minFrequency, int maxFrequency) => throw new NotImplementedException();
+#endregion
+
         public IEnumerator<T> GetEnumerator() => throw new NotImplementedException();
         IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
 
+#region Range functionality
         /// <summary>
         /// Creates a shallow copy of all items with the maximum frequency in the source <see cref="FrequencyTable{T}" />.
         /// </summary>
@@ -381,7 +552,9 @@ namespace Shipstone.System.Collections
 
         public IEnumerable<T> GetRange(int frequency) => throw new NotImplementedException();
         public IEnumerable<T> GetRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
+#endregion
 
+#region Remove functionality
         /// <summary>
         /// Removes an item from the <see cref="FrequencyTable{T}" />.
         /// </summary>
@@ -403,10 +576,68 @@ namespace Shipstone.System.Collections
         public int RemoveRange(IEnumerable<T> collection) => throw new NotImplementedException();
         public int RemoveRange(int frequency) => throw new NotImplementedException();
         public int RemoveRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
+#endregion
+
         public void Swap(T a, T b) => throw new NotImplementedException();
-        public void ToArray()  => throw new NotImplementedException();
-        public void ToArray(int frequency) => throw new NotImplementedException();
-        public void ToArray(int minFrequency, int maxFrequency) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Copies the items of the <see cref="FrequencyTable{T}" /> to a new array.
+        /// </summary>
+        /// <returns>An array containing copies of the items of the <see cref="FrequencyTable{T}" />.</returns>
+        public T[] ToArray()
+        {
+            T[] array = new T[this._Count];
+            this._CopyTo(array, 0, this._MinFrequency, this._MaxFrequency);
+            return array;
+        }
+
+        /// <summary>
+        /// Copies a range of items of the <see cref="FrequencyTable{T}" /> with the specified frequency to a new array.
+        /// </summary>
+        /// <param name="frequency">The frequency of items to copy.</param>
+        /// <returns>An array containing copies of the items with <c><paramref name="frequency" /></c> of the <see cref="FrequencyTable{T}" />.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than or equal to 0.</exception>
+        public T[] ToArray(int frequency)
+        {
+            if (frequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (frequency));
+            }
+
+            T[] array = new T[this._GetItemCount(frequency, frequency)];
+            this._CopyTo(array, 0, frequency, frequency);
+            return array;
+        }
+
+        /// <summary>
+        /// Copies a range of items of the <see cref="FrequencyTable{T}" /> within the specified inclusive frequency range to a new array.
+        /// </summary>
+        /// <param name="minFrequency">The minimum frequency of items to copy.</param>
+        /// <param name="maxFrequency">The maximum frequency of items to copy.</param>
+        /// <returns>An array containing copies of the items within the specified inclusive frequency range of the <see cref="FrequencyTable{T}" />.</returns>
+        /// <exception cref="ArgumentException"><c><paramref name="maxFrequency" /></c> is less than <c><paramref name="minFrequency" /></c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="minFrequency" /></c> is less than or equal to 0 -or- <c><paramref name="maxFrequency" /></c> is less than or equal to 0.</exception>
+        public T[] ToArray(int minFrequency, int maxFrequency)
+        {
+            if (minFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (minFrequency));
+            }
+
+            if (maxFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (maxFrequency));
+            }
+
+            if (maxFrequency < minFrequency)
+            {
+                throw new ArgumentException($"{nameof (maxFrequency)} is less than {nameof (minFrequency)}.");
+            }
+
+            T[] array = new T[this._GetItemCount(minFrequency, maxFrequency)];
+            this._CopyTo(array, 0, minFrequency, maxFrequency);
+            return array;
+        }
 #endregion
     }
 }

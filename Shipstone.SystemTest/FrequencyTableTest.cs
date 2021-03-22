@@ -531,6 +531,78 @@ namespace Shipstone.SystemTest
         public void TestContainsAll_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.ContainsAll(null));
 #endregion
 
+#region CopyTo tests
+#region Generic tests
+        [TestMethod]
+        public void TestCopyTo_Item_EmptyTable_NonZeroLengthArray() => this.TestCopyTo_Item_EmptyTable_Array(10);
+
+        [TestMethod]
+        public void TestCopyTo_Item_EmptyTable_ZeroLengthArray() => this.TestCopyTo_Item_EmptyTable_Array(0);
+
+        private void TestCopyTo_Item_EmptyTable_Array(int length)
+        {
+            int[] array = length == 0 ? Array.Empty<int>() : new int[length];
+            this._Table.CopyTo(array);
+            Assert.AreEqual(length, array.Length);
+            this._AssertProperties(0, 0, 0, 0);
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_NonEmptyTable_ArrayEqualSize()
+        {
+            int[] sample = FrequencyTableTest._Sample(out Dictionary<int, int> dictionary);
+            this._Table.AddRange(sample);
+            int[] array = new int[sample.Length];
+            this._Table.CopyTo(array);
+            Assert.AreEqual(sample.Length, array.Length);
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            this._AssertProperties(sample.Length, dictionary.Count, min, max);
+            IDictionary<int, int> arrayDictionary = new Dictionary<int, int>();
+
+            foreach (int item in array)
+            {
+                if (arrayDictionary.ContainsKey(item))
+                {
+                    ++ arrayDictionary[item];
+                }
+
+                else
+                {
+                    arrayDictionary.Add(item, 1);
+                }
+            }
+
+            Assert.AreEqual(dictionary.Count, arrayDictionary.Count);
+            
+            foreach (int item in arrayDictionary.Keys)
+            {
+                Assert.AreEqual(dictionary[item], arrayDictionary[item]);
+            }
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_NonEmptyTable_ArrayTooSmall() => this.TestCopyTo_Item_NonEmptyTable_ArrayTooSmall(FrequencyTableTest._SampleLength - 1);
+
+        [TestMethod]
+        public void TestCopyTo_Item_NonEmptyTable_ZeroLengthArray() => this.TestCopyTo_Item_NonEmptyTable_ArrayTooSmall(0);
+
+        private void TestCopyTo_Item_NonEmptyTable_ArrayTooSmall(int length)
+        {
+            int[] sample = FrequencyTableTest._Sample(out Dictionary<int, int> dictionary);
+            this._Table.AddRange(sample);
+            int[] array = length == 0 ? Array.Empty<int>() : new int[length];
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Table.CopyTo(array));
+            Assert.AreEqual("The number of items in the source FrequencyTable<T> is greater than the number of items that the destination array can contain.", ex.Message);
+            Assert.AreEqual(length, array.Length);
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            this._AssertProperties(sample.Length, dictionary.Count, min, max);
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.CopyTo(null));
+#endregion
+#endregion
+
 #region Get Range functionality
 #region GetMax tests
         [TestMethod]

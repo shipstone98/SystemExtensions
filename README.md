@@ -33,10 +33,17 @@ Extension classes to .NET Standard 2.0.
 - public void Clear(): removes all items from the FrequencyTable<T>
 - public bool Contains(T item): determines whether an item is in the FrequencyTable<T>
 - public bool ContainsAll(IEnumerable<T> collection): determines whether all items contained in the specified collection are in the FrequencyTable<T>
+- public void CopyTo(T[] array): copies the entire FrequencyTable<T> to a compatible one-dimensional array, starting at the beginning of the target array
+- public void CopyTo(T[] array, int arrayIndex): copies the entire FrequencyTable<T> to a compatible one-dimensional array, starting at the specified index of the target array
+- public void CopyTo(T[] array, int arrayIndex, int frequency): copies the a range of items from the FrequencyTable<T> with the specified frequency to a compatible one-dimensional array, starting at the specified index of the target array
+- public void CopyTo(T[] array, int arrayIndex, int minFrequency, int maxFrequency): copies the a range of items from the FrequencyTable<T> within the specified inclusive frequency range to a compatible one-dimensional array, starting at the specified index of the target array
 - public IEnumerable<T> GetMax(): creates a shallow copy of all items with the maximum frequency in the source FrequencyTable<T>
 - public IEnumerable<T> GetMin(): creates a shallow copy of all items with the minimum frequency in the source
 - public bool Remove(T item): removes an item from the FrequencyTable<T>
 - public bool Remove(T item, int frequency): decreases the frequency of the specified item in the FrequencyTable<T>
+- public T[] ToArray(): copies the items of the FrequencyTable<T> to a new array
+- public T[] ToArray(int frequency): copies a range of items of the FrequencyTable<T> with the specified frequency to a new array
+- public T[] ToArray(int minFrequency, int maxFrequency): copies a range of items of the FrequencyTable<T> within the specified inclusive frequency range to a new array
 
 #### Explicit Interface Implementations
 - bool ICollection.IsSynchronized
