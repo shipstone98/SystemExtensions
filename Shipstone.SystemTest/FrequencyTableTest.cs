@@ -573,6 +573,7 @@ namespace Shipstone.SystemTest
             }
 
             Assert.AreEqual(0, dictionaryMaxCollection.Count);
+            this._AssertProperties(sample.Length, dictionary.Count, min, max);
         }
 #endregion
 
@@ -617,6 +618,7 @@ namespace Shipstone.SystemTest
             }
 
             Assert.AreEqual(0, dictionaryMinCollection.Count);
+            this._AssertProperties(sample.Length, dictionary.Count, min, max);
         }
 #endregion
 #endregion
