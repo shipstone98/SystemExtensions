@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 using Shipstone.System.Collections;
 
@@ -56,6 +57,72 @@ namespace Shipstone.System.Numerics
         {
             FrequencyTable<double> table = new FrequencyTable<double>(collection);
             return table.Count == 0 ? 0 : MathExtensions._Mean(table.GetMax());
+        }
+
+        /// <summary>
+        /// Solves for x the quadratic equation of the form <c><paramref name="a" />x ^ 2 + <paramref name="b" />x + <paramref name="c" /> = 0 </c>.
+        /// </summary>
+        /// <param name="a">The quadratic coefficient of the equation.</param>
+        /// <param name="b">The linear coefficient of the equation.</param>
+        /// <param name="c">The constant coefficient of the equation.</param>
+        /// <param name="x1">The lesser root of the equation.</param>
+        /// <param name="x2">The greater root of the equation.</param>
+        /// <returns>2 if the equation has two distinct, real roots; 1 if the equation has two repeated roots; otherwise, 0 if the equation has two complex roots.</returns>
+        /// <exception cref="ArgumentException"><c><paramref name="a" /></c> is equal to 0.</exception>
+        public static int SolveQuadratic(double a, double b, double c, out Complex x1, out Complex x2)
+        {
+            if (a == 0)
+            {
+                throw new ArgumentException("a is equal to 0.");
+            }
+
+            Decimal adbl = Convert.ToDecimal(a), bdbl = Convert.ToDecimal(b), cdbl = Convert.ToDecimal(c), a2 = 2 * adbl, minusB = bdbl * -1, disc = bdbl * bdbl - 4 * adbl * cdbl, discSqrt;
+            int compar = disc.CompareTo(0);
+
+            if (compar > 0)
+            {
+                discSqrt = Convert.ToDecimal(Math.Sqrt(Convert.ToDouble(disc)));
+                x1 = new Complex(Convert.ToDouble((minusB - discSqrt) / a2), 0);
+                x2 = new Complex(Convert.ToDouble((minusB + discSqrt) / a2), 0);
+                return 2;
+            }
+
+            double real = Convert.ToDouble(minusB / a2);
+
+            if (compar == 0)
+            {
+                x1 = x2 = new Complex(real, 0);
+                return 1;
+            }
+
+            discSqrt = Convert.ToDecimal(Math.Sqrt(Convert.ToDouble(disc * -1)));
+            double imag = Convert.ToDouble(discSqrt / a2);
+            x1 = new Complex(real, -1 * imag);
+            x2 = new Complex(real, imag);
+            return 0;
+        }
+
+        /// <summary>
+        /// Solves for x the quadratic equation of the form <c><paramref name="a" />x ^ 2 + <paramref name="b" />x + <paramref name="c" /> = 0 </c>.
+        /// </summary>
+        /// <param name="a">The quadratic coefficient of the equation.</param>
+        /// <param name="b">The linear coefficient of the equation.</param>
+        /// <param name="c">The constant coefficient of the equation.</param>
+        /// <param name="x1">The lesser root of the equation.</param>
+        /// <param name="x2">The greater root of the equation.</param>
+        /// <returns><c>true</c> if the equation has one or more real roots; otherwise, <c>false</c> if the equation has only complex roots.</returns>
+        /// <exception cref="ArgumentException"><c><paramref name="a" /></c> is equal to 0.</exception>
+        public static bool TrySolveQuadratic(double a, double b, double c, out double x1, out double x2)
+        {
+            if (MathExtensions.SolveQuadratic(a, b, c, out Complex cmplx1, out Complex cmplx2) == 0)
+            {
+                x1 = x2 = 0;
+                return false;
+            }
+
+            x1 = cmplx1.Real;
+            x2 = cmplx2.Real;
+            return true;
         }
 
         /// <summary>

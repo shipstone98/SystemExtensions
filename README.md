@@ -69,6 +69,8 @@ Extension classes to .NET Standard 2.0.
 - public static double Mean(IEnumerable<double> collection): calculates the mean average of values in the specified collection
 - public static double Mean(IEnumerable<double> collection): calculates the median average of values in the specified sorted collection
 - public static double Mode(IEnumerable<double> collection): calculates the modal average of values in the specified collection
+- public static int SolveQuadratic(double a, double b, double c, out Complex x1, out Complex x2): solves for x the quadratic equation of the form ax ^ 2 + bx + c = 0
+- public static bool TrySolveQuadratic(double a, double b, double c, out double x1, out double x2): solves for x the quadratic equation of the form ax ^ 2 + bx + c = 0
 - public static double Variance(IEnumerable<double> collection): calculates the population variance of values in the specified collection
 - public static double Variance(IEnumerable<double> collection, double mean): calculates the population variance of values in the specified collection using the pre-calculated mean
 - public static double Variance(IEnumerable<double> collection, out double mean): calculates the population variance of values in the specified collection
