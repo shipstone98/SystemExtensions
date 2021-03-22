@@ -63,6 +63,7 @@ Extension classes to .NET Standard 2.0.
 
 ## Shipstone.System.Numerics
 - public static class MathExtensions: provides static methods for common mathematical and statistical functions
+- public class Matrix: represents a matrix of specified size
 
 ### MathExtensions
 #### Methods
@@ -74,3 +75,13 @@ Extension classes to .NET Standard 2.0.
 - public static double Variance(IEnumerable<double> collection): calculates the population variance of values in the specified collection
 - public static double Variance(IEnumerable<double> collection, double mean): calculates the population variance of values in the specified collection using the pre-calculated mean
 - public static double Variance(IEnumerable<double> collection, out double mean): calculates the population variance of values in the specified collection
+
+### Matrix : IEquatable<Matrix>
+#### Constructors
+- public Matrix(int rows, int columns): initializes a new instance of the Matrix class that is empty and contains the specified number of rows and columns
+- public Matrix(Matrix matrix): initializes a new instance of the Matrix class that contains values copied from the specified matrix and has an equal number of rows and columns
+
+#### Properties
+- public int Columns: gets the number of columns in the Matrix
+- public int Rows: gets the number of rows in the Matrix
+- public double this[int row, int column]: gets or sets the value at the specified entry in the Matrix
