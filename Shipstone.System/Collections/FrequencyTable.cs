@@ -175,6 +175,36 @@ namespace Shipstone.System.Collections
             this._ResetMaxMin();
         }
 
+        private bool _Remove(T item, int frequency)
+        {
+            int index = this._Items.IndexOf(item);
+
+            if (index == -1)
+            {
+                return false;
+            }
+
+            if (this._Frequencies[index] < frequency)
+            {
+                frequency = this._Frequencies[index];
+            }
+
+            if (this._Frequencies[index] == frequency)
+            {
+                this._Items.RemoveAt(index);
+                this._Frequencies.RemoveAt(index);
+            }
+            
+            else
+            {
+                this._Frequencies[index] -= frequency;
+            }
+
+            this._Count -= frequency;
+            this._ResetMaxMin();
+            return true;
+        }
+
         private void _ResetMaxMin()
         {
             if (this._Count == 0)
@@ -351,36 +381,6 @@ namespace Shipstone.System.Collections
 
         public IEnumerable<T> GetRange(int frequency) => throw new NotImplementedException();
         public IEnumerable<T> GetRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
-
-        private bool _Remove(T item, int frequency)
-        {
-            int index = this._Items.IndexOf(item);
-
-            if (index == -1)
-            {
-                return false;
-            }
-
-            if (this._Frequencies[index] < frequency)
-            {
-                frequency = this._Frequencies[index];
-            }
-
-            if (this._Frequencies[index] == frequency)
-            {
-                this._Items.RemoveAt(index);
-                this._Frequencies.RemoveAt(index);
-            }
-            
-            else
-            {
-                this._Frequencies[index] -= frequency;
-            }
-
-            this._Count -= frequency;
-            this._ResetMaxMin();
-            return true;
-        }
 
         /// <summary>
         /// Removes an item from the <see cref="FrequencyTable{T}" />.
