@@ -1,3 +1,31 @@
 # SystemExtensions
 
 Extension classes to .NET Standard 2.0.
+
+## Namespaces
+- Shipstone.System.Collections: contains classes that define generic collections, which allows users to create strongly typed collections that provide better type safety and performance than non-generic strongly typed collections
+
+## Shipstone.System.Collections
+- FrequencyTable<T>: represents a strongly types frequency table of items
+
+### FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
+#### Constructors
+- public FrequencyTable(): initializes a new instance of the <see cref="FrequencyTable{T}" /> class that is empty
+- public FrequencyTable(IEnumerable<T> collection): initializes a new instance of the <see cref="FrequencyTable{T}" /> class that contains items copied from the specified collection
+- public FrequencyTable(FrequencyTable<T> table): initializes a new instance of the <see cref="FrequencyTable{T}" /> class that contains items copied from the specified frequency table
+
+#### Properties
+- public int Count { get; }: gets the number of items contained in the <see cref="FrequencyTable{T}" />
+- public IEnumerable<int> Frequencies { get; }: gets a collection containing the frequencies of all items contained in the <see cref="FrequencyTable{T}" />
+- public IEnumerable<T> Items { get; }: gets a collection containing all items contained in the <see cref="FrequencyTable{T}" />
+- public T this[int frequency] { get; set; }: gets or sets the frequency of the specified item
+
+#### Methods
+- public void Clear(): removes all items from the <see cref="FrequencyTable{T}" />
+- public bool Contains(T item): determines whether an item is in the <see cref="FrequencyTable{T}" />
+
+#### Explicit Interface Implementations
+- bool ICollection.IsSynchronized
+- Object ICollection.SyncRoot
+- bool ICollection<T>.IsReadOnly
+- IEnumerator IEnumerable.GetEnumerator()
