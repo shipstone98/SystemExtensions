@@ -351,8 +351,53 @@ namespace Shipstone.System.Collections
 
         public IEnumerable<T> GetRange(int frequency) => throw new NotImplementedException();
         public IEnumerable<T> GetRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
-        public bool Remove(T item) => throw new NotImplementedException();
-        public bool Remove(T item, int frequency) => throw new NotImplementedException();
+
+        private bool _Remove(T item, int frequency)
+        {
+            int index = this._Items.IndexOf(item);
+
+            if (index == -1)
+            {
+                return false;
+            }
+
+            if (this._Frequencies[index] < frequency)
+            {
+                frequency = this._Frequencies[index];
+            }
+
+            if (this._Frequencies[index] == frequency)
+            {
+                this._Items.RemoveAt(index);
+                this._Frequencies.RemoveAt(index);
+            }
+            
+            else
+            {
+                this._Frequencies[index] -= frequency;
+            }
+
+            this._Count -= frequency;
+            this._ResetMaxMin();
+            return true;
+        }
+
+        /// <summary>
+        /// Removes an item from the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="item">The item to remove from the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
+        /// <returns><c>true</c> if <c><paramref name="item" /></c> is successfully removed; otherwise, <c>false</c>. This method also returns <c>false</c> if <c><paramref name="item" /></c> was not found in the <see cref="FrequencyTable{T}" />.</returns>
+        public bool Remove(T item) => this._Remove(item, 1);
+
+        /// <summary>
+        /// Decreases the frequency of the specified item in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="item">The item to decrease the frequency of in the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
+        /// <param name="frequency">The decrease to increase the current frequency of <c><paramref name="item" /></c> by.</param>
+        /// <returns><c>true</c> if <c><paramref name="item" /></c> is successfully decreased by at most <c><paramref name="frequency" /></c>; otherwise, <c>false</c>. This method also returns <c>false</c> if <c><paramref name="item" /></c> was not found in the <see cref="FrequencyTable{T}" />.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than 0.</exception>
+        public bool Remove(T item, int frequency) => frequency < 0 ? throw new ArgumentOutOfRangeException(nameof (frequency)) : frequency > 0 && this._Remove(item, frequency);
+        
         public int RemoveAll(T item) => throw new NotImplementedException();
         public int RemoveAll(Predicate<T> match) => throw new NotImplementedException();
         public int RemoveRange(IEnumerable<T> collection) => throw new NotImplementedException();

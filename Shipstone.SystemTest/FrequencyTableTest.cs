@@ -622,5 +622,102 @@ namespace Shipstone.SystemTest
         }
 #endregion
 #endregion
+
+#region Remove functionality
+#region Remove tests
+        [TestMethod]
+        public void TestRemove_Item_Empty()
+        {
+            Assert.IsFalse(this._Table.Remove(10));
+            this._AssertProperties(0, 0, 0, 0);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_NotEmpty_Contains()
+        {
+            const int CONTROL = 10, CONSTANT = 20;
+            this._Table[CONTROL] = CONTROL;
+            this._Table[CONSTANT] = CONSTANT;
+            Assert.IsTrue(this._Table.Remove(CONTROL));
+            Assert.AreEqual(CONTROL - 1, this._Table[CONTROL]);
+            Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            this._AssertProperties(CONSTANT + CONTROL - 1, 2, CONTROL - 1, CONSTANT);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_NotEmpty_NotContains()
+        {
+            const int CONTROL = 10, CONSTANT = 20;
+            this._Table[CONSTANT] = CONSTANT;
+            Assert.IsFalse(this._Table.Remove(CONTROL));
+            Assert.AreEqual(0, this._Table[CONTROL]);
+            Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            this._AssertProperties(CONSTANT, 1, CONSTANT, CONSTANT);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_Int32_Empty()
+        {
+            Assert.IsFalse(this._Table.Remove(10, 1));
+            this._AssertProperties(0, 0, 0, 0);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_Int32_NotEmpty_Contains_Less()
+        {
+            const int CONTROL = 10, CONSTANT = 20;
+            this._Table[CONTROL] = CONTROL;
+            this._Table[CONSTANT] = CONSTANT;
+            Assert.IsTrue(this._Table.Remove(CONTROL, CONTROL + 1));
+            Assert.AreEqual(0, this._Table[CONTROL]);
+            Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            this._AssertProperties(CONSTANT, 1, CONSTANT, CONSTANT);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_Int32_NotEmpty_Contains_Equal()
+        {
+            const int CONTROL = 10, CONSTANT = 20;
+            this._Table[CONTROL] = CONTROL;
+            this._Table[CONSTANT] = CONSTANT;
+            Assert.IsTrue(this._Table.Remove(CONTROL, CONTROL));
+            Assert.AreEqual(0, this._Table[CONTROL]);
+            Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            this._AssertProperties(CONSTANT, 1, CONSTANT, CONSTANT);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_Int32_NotEmpty_Contains_More()
+        {
+            const int CONTROL = 10, CONSTANT = 20;
+            this._Table[CONTROL] = CONTROL;
+            this._Table[CONSTANT] = CONSTANT;
+            Assert.IsTrue(this._Table.Remove(CONTROL, CONTROL - 1));
+            Assert.AreEqual(1, this._Table[CONTROL]);
+            Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            this._AssertProperties(CONSTANT + 1, 2, 1, CONSTANT);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_Int32_NotEmpty_NotContains()
+        {
+            const int CONTROL = 10, CONSTANT = 20;
+            this._Table[CONSTANT] = CONSTANT;
+            Assert.IsFalse(this._Table.Remove(CONTROL));
+            Assert.AreEqual(0, this._Table[CONTROL]);
+            Assert.AreEqual(CONSTANT, this._Table[CONSTANT]);
+            this._AssertProperties(CONSTANT, 1, CONSTANT, CONSTANT);
+        }
+
+        [TestMethod]
+        public void TestRemove_Item_Int32_OutOfRange()
+        {
+            const int CONTROL = 10;
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.Remove(CONTROL, Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.Remove(CONTROL, -1));
+            this._AssertProperties(0, 0, 0, 0);
+        }
+#endregion
+#endregion
     }
 }

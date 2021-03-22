@@ -9,6 +9,10 @@ Extension classes to .NET Standard 2.0.
 - FrequencyTable<T>: represents a strongly types frequency table of items
 
 ### FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
+#### Remarks
+- Add methods and Item property do not currently prevent frequency overflow - this will be fixed
+- No unit tests for null as item parameters (currently only testing value types)
+
 #### Constructors
 - public FrequencyTable(): initializes a new instance of the FrequencyTable<T> class that is empty
 - public FrequencyTable(IEnumerable<T> collection): initializes a new instance of the FrequencyTable<T> class that contains items copied from the specified collection
@@ -31,6 +35,8 @@ Extension classes to .NET Standard 2.0.
 - public bool ContainsAll(IEnumerable<T> collection): determines whether all items contained in the specified collection are in the FrequencyTable<T>
 - public IEnumerable<T> GetMax(): creates a shallow copy of all items with the maximum frequency in the source FrequencyTable<T>
 - public IEnumerable<T> GetMin(): creates a shallow copy of all items with the minimum frequency in the source
+- public bool Remove(T item): removes an item from the FrequencyTable<T>
+- public bool Remove(T item, int frequency): decreases the frequency of the specified item in the FrequencyTable<T>
 
 #### Explicit Interface Implementations
 - bool ICollection.IsSynchronized
