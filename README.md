@@ -85,3 +85,13 @@ Extension classes to .NET Standard 2.0.
 - public int Columns: gets the number of columns in the Matrix
 - public int Rows: gets the number of rows in the Matrix
 - public double this[int row, int column]: gets or sets the value at the specified entry in the Matrix
+
+#### Methods
+- public override bool Equals(Object obj): returns a value indicating whether this instance is equal to a specified object
+- public bool Equals(Matrix matrix): returns a value indicating whether this instance is equal to a specified Matrix
+- public override int GetHashCode(): returns the hash code for this instance
+- public Matrix Multiply(Matrix matrix): multiples the current Matrix instance by matrix and returns the result as a new Matrix
+
+#### Operators
+- public static bool operator ==(Matrix a, Matrix b): determines whether two matrices are equal
+- public static bool operator !=(Matrix a, Matrix b): determines whether two matrices are unequal

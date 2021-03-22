@@ -97,7 +97,7 @@ namespace Shipstone.System.Numerics
                 throw new IndexOutOfRangeException(nameof (column) + " is less than 0.");
             }
 
-            if (column >= this.Rows)
+            if (column >= this._Columns)
             {
                 throw new IndexOutOfRangeException(nameof (column) + " is greater than or equal to Matrix.Columns.");
             }
@@ -110,25 +110,122 @@ namespace Shipstone.System.Numerics
                 throw new IndexOutOfRangeException(nameof (row) + " is less than 0.");
             }
 
-            if (row >= this.Rows)
+            if (row >= this._Rows)
             {
                 throw new IndexOutOfRangeException(nameof (row) + " is greater than or equal to Matrix.Rows.");
             }
         }
 
         public Matrix Add(Matrix matrix) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare with this instance.</param>
+        /// <returns><c>true</c> if <c><paramref name="obj" /></c> is an instance of <see cref="Matrix" /> and equals the value of this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(Object obj) => this.Equals(obj as Matrix);
-        public bool Equals(Matrix matrix) => throw new NotImplementedException();
-        public override int GetHashCode() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="matrix">A <see cref="Matrix" /> to compare with this instance.</param>
+        /// <returns><c>true</c> if <c><paramref name="matrix" /></c> has the same number of rows and columns and values in all entries as this instance; otherwise, <c>false</c>.</returns>
+        public bool Equals(Matrix matrix)
+        {
+            if (matrix is null || !(this._Rows == matrix._Rows && this._Columns == matrix._Columns))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < this._Rows; i ++)
+            {
+                for (int j = 0; j < this._Columns; j ++)
+                {
+                    if (this._Array[i, j] != matrix._Array[i, j])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer hash code.</returns>
+        public override int GetHashCode()
+        {
+            int hashCode = this._Rows.GetHashCode() ^ this._Columns.GetHashCode();
+
+            for (int i = 0; i < this._Rows; i ++)
+            {
+                for (int j = 0; j < this._Columns; j ++)
+                {
+                    hashCode ^= this._Array[i, j].GetHashCode();
+                }
+            }
+
+            return hashCode ^ 31;
+        }
+
         public Matrix Multiply(double scalar) => throw new NotImplementedException();
-        public Matrix Multiply(Matrix matrix) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Multiples the current <see cref="Matrix" /> instance by <c><paramref name="matrix" /></c> and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="matrix">The <see cref="Matrix" /> to multiply the current instance by.</param>
+        /// <returns>The result of the current <see cref="Matrix" /> instance multiplied by <c><paramref name="matrix" /></c>.</returns>
+        /// <exception><see cref="Matrix.Columns" /> is not equal to the number of rows in <c><paramref name="matrix" /></c>.
+        public Matrix Multiply(Matrix matrix)
+        {
+            if (matrix is null)
+            {
+                throw new ArgumentNullException(nameof (matrix));
+            }
+
+            if (this._Columns != matrix._Rows)
+            {
+                throw new ArgumentException($"Matrix.Columns is not equal to the number of rows in {nameof (matrix)}.");
+            }
+
+            Matrix result = new Matrix(this._Rows, this._Columns);
+
+            for (int i = 0; i < result._Rows; i ++)
+            {
+                for (int j = 0; j < result._Columns; j ++)
+                {
+                    for (int k = 0; k < this._Columns; k ++)
+                    {
+                        result._Array[i, j] += this._Array[i, k] * matrix._Array[k, j];
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public Matrix Subtract(Matrix matrix) => throw new NotImplementedException();
         public override String ToString() => this.ToString(false);
         public String ToString(bool includeBorders) => throw new NotImplementedException();
 
         public static Matrix CreateIndentity(int size) => throw new NotImplementedException();
 
+        /// <summary>
+        /// Determines whether two matrices are equal.
+        /// </summary>
+        /// <param name="a">The first <see cref="Matrix" /> to compare, or <c>null</c>.</param>
+        /// <param name="b">The second <see cref="Matrix" /> to compare, or <c>null</c>.</param>
+        /// <returns><c>true</c> if <c><paramref name="a" /></c> and <c><paramref name="b" /></c> contain the same number of rows and columns and values in all entries; otherwise, <c>false</c>.</returns>
         public static bool operator ==(Matrix a, Matrix b) => a is null ? b is null : a.Equals(b);
+
+        /// <summary>
+        /// Determines whether two matrices are unequal.
+        /// </summary>
+        /// <param name="a">The first <see cref="Matrix" /> to compare, or <c>null</c>.</param>
+        /// <param name="b">The second <see cref="Matrix" /> to compare, or <c>null</c>.</param>
+        /// <returns><c>true</c> if <c><paramref name="a" /></c> and <c><paramref name="b" /></c> contain a different number of rows or columns or values in any entry; otherwise, <c>false</c>.</returns>
         public static bool operator !=(Matrix a, Matrix b) => !(a == b);
     }
 }
