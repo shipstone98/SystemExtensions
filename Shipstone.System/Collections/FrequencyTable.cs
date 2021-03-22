@@ -161,7 +161,17 @@ namespace Shipstone.System.Collections
         public void Add(T item) => throw new NotImplementedException();
         public void Add(T item, int frequency) => throw new NotImplementedException();
         public void AddRange(IEnumerable<T> collection) => throw new NotImplementedException();
-        public void Clear() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Removes all items from the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        public void Clear()
+        {
+            this._Count = 0;
+            this._Frequencies.Clear();
+            this._Items.Clear();
+        }
+
         public bool Contains(T item) => throw new NotImplementedException();
         public bool ContainsRange(IEnumerable<T> collection) => throw new NotImplementedException();
         public void CopyTo(T[] array) => throw new NotImplementedException();

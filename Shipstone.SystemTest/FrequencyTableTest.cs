@@ -173,24 +173,24 @@ namespace Shipstone.SystemTest
         [TestMethod]
         public void TestConstructor_IEnumerable_Empty()
         {
-            FrequencyTable<int> table = new FrequencyTable<int>(Array.Empty<int>());
-            Assert.AreEqual(0, table.Count);
-            Assert.AreEqual(0, table.Frequencies.Count());
-            Assert.AreEqual(0, table.Items.Count());
+            this._Table = new FrequencyTable<int>(Array.Empty<int>());
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.AreEqual(0, this._Table.Items.Count());
         }
 
         [TestMethod]
         public void TestConstructor_IEnumerable_NotEmpty()
         {
             int[] sample = FrequencyTableTest._Sample(1, 10, out Dictionary<int, int> dictionary);
-            FrequencyTable<int> table = new FrequencyTable<int>(sample);
-            Assert.AreEqual(sample.Length, table.Count);
+            this._Table = new FrequencyTable<int>(sample);
+            Assert.AreEqual(sample.Length, this._Table.Count);
 
             for (int i = 0; i < sample.Length; i ++)
             {
                 int n = sample[i];
-                Assert.IsTrue(table.Items.Contains(n));
-                Assert.AreEqual(dictionary[n], table[n]);
+                Assert.IsTrue(this._Table.Items.Contains(n));
+                Assert.AreEqual(dictionary[n], this._Table[n]);
             }
         }
 
@@ -200,36 +200,69 @@ namespace Shipstone.SystemTest
         [TestMethod]
         public void TestConstructor_FrequencyTable_Empty()
         {
-            FrequencyTable<int> table = new FrequencyTable<int>(this._Table);
-            Assert.AreEqual(0, table.Count);
-            Assert.AreEqual(0, table.Frequencies.Count());
-            Assert.AreEqual(0, table.Items.Count());
+            this._Table = new FrequencyTable<int>(this._Table);
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.AreEqual(0, this._Table.Items.Count());
         }
 
         [TestMethod]
         public void TestConstructor_FrequencyTable_NotEmpty()
         {
             int[] sample = FrequencyTableTest._Sample(1, 10, out Dictionary<int, int> dictionary);
-            FrequencyTable<int> oldTable = new FrequencyTable<int>(sample);
-            FrequencyTable<int> table = new FrequencyTable<int>(oldTable);
-            Assert.AreEqual(oldTable.Count, table.Count);
-            Assert.AreEqual(oldTable.Frequencies.Count(), table.Frequencies.Count());
-            Assert.AreEqual(oldTable.Items.Count(), table.Items.Count());
+            this._Table = new FrequencyTable<int>(sample);
+            FrequencyTable<int> table = new FrequencyTable<int>(this._Table);
+            Assert.AreEqual(this._Table.Count, table.Count);
+            Assert.AreEqual(this._Table.Frequencies.Count(), table.Frequencies.Count());
+            Assert.AreEqual(this._Table.Items.Count(), table.Items.Count());
             
             foreach (int item in table.Items)
             {
-                Assert.IsTrue(oldTable.Items.Contains(item));
-                Assert.AreEqual(oldTable[item], table[item]);
+                Assert.IsTrue(this._Table.Items.Contains(item));
+                Assert.AreEqual(this._Table[item], table[item]);
             }
             
             foreach (int frequency in table.Frequencies)
             {
-                Assert.IsTrue(oldTable.Frequencies.Contains(frequency));
+                Assert.IsTrue(this._Table.Frequencies.Contains(frequency));
             }
         }
 
         [TestMethod]
         public void TestConstructor_FrequencyTable_Null() => Assert.ThrowsException<ArgumentNullException>(() => new FrequencyTable<int>(null));
 #endregion
+
+#region Clear tests
+        [TestMethod]
+        public void TestClear_Empty()
+        {
+            this._Table.Clear();
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.AreEqual(0, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestClear_NotEmpty_MultipleItems()
+        {
+            int[] sample = FrequencyTableTest._Sample();
+            this._Table = new FrequencyTable<int>(sample);
+            this._Table.Clear();
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.AreEqual(0, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestClear_NotEmpty_SingleItem()
+        {
+            const int CONSTANT = 10;
+            this._Table[CONSTANT] = CONSTANT;
+            this._Table.Clear();
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.AreEqual(0, this._Table.Items.Count());
+        }
+#endregion    
     }
 }
