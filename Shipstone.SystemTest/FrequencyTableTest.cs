@@ -533,6 +533,7 @@ namespace Shipstone.SystemTest
 
 #region CopyTo tests
 #region Generic tests
+#region CopyTo(T) tests
         [TestMethod]
         public void TestCopyTo_Item_EmptyTable_NonZeroLengthArray() => this.TestCopyTo_Item_EmptyTable_Array(10);
 
@@ -600,6 +601,114 @@ namespace Shipstone.SystemTest
 
         [TestMethod]
         public void TestCopyTo_Item_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.CopyTo(null));
+#endregion
+
+#region CopyTo(T[], int) tests
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_EmptyTable_NonZeroLengthArray_PositiveIndex()
+        {
+            this.TestCopyTo_Item_Int32_EmptyTable_Array(10, 1);
+            this.TestCopyTo_Item_Int32_EmptyTable_Array(10, Int32.MaxValue);
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_EmptyTable_NonZeroLengthArray_ZeroIndex() => this.TestCopyTo_Item_Int32_EmptyTable_Array(10, 0);
+        
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_EmptyTable_ZeroLengthArray_PositiveIndex()
+        {
+            this.TestCopyTo_Item_Int32_EmptyTable_Array(0, 1);
+            this.TestCopyTo_Item_Int32_EmptyTable_Array(0, Int32.MaxValue);
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_EmptyTable_ZeroLengthArray_ZeroIndex() => this.TestCopyTo_Item_Int32_EmptyTable_Array(0, 0);
+
+        private void TestCopyTo_Item_Int32_EmptyTable_Array(int length, int arrayIndex)
+        {
+            int[] array = length == 0 ? Array.Empty<int>() : new int[length];
+            this._Table.CopyTo(array, arrayIndex);
+            Assert.AreEqual(length, array.Length);
+            this._AssertProperties(0, 0, 0, 0);
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_NonEmptyTable_ArrayEqualSize_InvalidIndex()
+        {
+            int[] sample = FrequencyTableTest._Sample(out Dictionary<int, int> dictionary);
+            this.TestCopyTo_Item_Int32_NonEmptyTable_ArrayTooSmall(sample.Length, 1, sample, dictionary);
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_NonEmptyTable_ArrayEqualSize_ValidIndex()
+        {
+            int[] sample = FrequencyTableTest._Sample(out Dictionary<int, int> dictionary);
+            this._Table.AddRange(sample);
+            int[] array = new int[sample.Length + 1];
+            this._Table.CopyTo(array, 1);
+            Assert.AreEqual(0, array[0]);
+            Assert.AreEqual(sample.Length + 1, array.Length);
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            this._AssertProperties(sample.Length, dictionary.Count, min, max);
+            IDictionary<int, int> arrayDictionary = new Dictionary<int, int>();
+
+            for (int i = 1; i < array.Length; i ++)
+            {
+                int item = array[i];
+
+                if (arrayDictionary.ContainsKey(item))
+                {
+                    ++ arrayDictionary[item];
+                }
+
+                else
+                {
+                    arrayDictionary.Add(item, 1);
+                }
+            }
+
+            Assert.AreEqual(dictionary.Count, arrayDictionary.Count);
+            
+            foreach (int item in arrayDictionary.Keys)
+            {
+                Assert.AreEqual(dictionary[item], arrayDictionary[item]);
+            }
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_NonEmptyTable_ArrayTooSmall() => this.TestCopyTo_Item_Int32_NonEmptyTable_ArrayTooSmall(FrequencyTableTest._SampleLength - 1, 0);
+
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_NonEmptyTable_ZeroLengthArray() => this.TestCopyTo_Item_Int32_NonEmptyTable_ArrayTooSmall(0, 0);
+
+        private void TestCopyTo_Item_Int32_NonEmptyTable_ArrayTooSmall(int length, int arrayIndex)
+        {
+            int[] sample = FrequencyTableTest._Sample(out Dictionary<int, int> dictionary);
+            this.TestCopyTo_Item_Int32_NonEmptyTable_ArrayTooSmall(length, arrayIndex, sample, dictionary);
+        }
+
+        private void TestCopyTo_Item_Int32_NonEmptyTable_ArrayTooSmall(int length, int arrayIndex, int[] sample, Dictionary<int, int> dictionary)
+        {
+            this._Table.AddRange(sample);
+            int[] array = length == 0 ? Array.Empty<int>() : new int[length];
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Table.CopyTo(array, arrayIndex));
+            Assert.AreEqual("The number of items in the source FrequencyTable<T> is greater than the available space from arrayIndex to the end of the destination array.", ex.Message);
+            Assert.AreEqual(length, array.Length);
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            this._AssertProperties(sample.Length, dictionary.Count, min, max);
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_NegativeIndex()
+        {
+            int[] array = Array.Empty<int>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.CopyTo(array, Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.CopyTo(array, -1));
+        }
+
+        [TestMethod]
+        public void TestCopyTo_Item_Int32_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.CopyTo(null, 0));
+#endregion
 #endregion
 #endregion
 

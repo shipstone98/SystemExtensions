@@ -387,6 +387,11 @@ namespace Shipstone.System.Collections
                 throw new ArgumentOutOfRangeException(nameof (arrayIndex));
             }
 
+            if (this.Count == 0)
+            {
+                return;
+            }
+
             if (array.Length - arrayIndex < this._Count)
             {
                 throw new ArgumentException($"The number of items in the source {FrequencyTable<T>._ClassName} is greater than the available space from {nameof (arrayIndex)} to the end of the destination {nameof (array)}.");
@@ -474,7 +479,7 @@ namespace Shipstone.System.Collections
 
             this._CopyTo(array, arrayIndex, minFrequency, maxFrequency);
         }
-        
+
         public void CopyTo(Array array) => throw new NotImplementedException();
         public void CopyTo(Array array, int arrayIndex) => throw new NotImplementedException();
         public void CopyTo(Array array, int arrayIndex, int frequency) =>  throw new NotImplementedException();
