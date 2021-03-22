@@ -12,6 +12,7 @@ Extension classes to .NET Standard 2.0.
 #### Remarks
 - Add methods and Item property do not currently prevent frequency overflow - this will be fixed
 - No unit tests for null as item parameters (currently only testing value types)
+- CopyTo and ToArray tests not yet fully implemented
 
 #### Constructors
 - public FrequencyTable(): initializes a new instance of the FrequencyTable<T> class that is empty
