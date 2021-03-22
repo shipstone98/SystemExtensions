@@ -37,6 +37,7 @@ Extension classes to .NET Standard 2.0.
 - public void CopyTo(T[] array, int arrayIndex): copies the entire FrequencyTable<T> to a compatible one-dimensional array, starting at the specified index of the target array
 - public void CopyTo(T[] array, int arrayIndex, int frequency): copies the a range of items from the FrequencyTable<T> with the specified frequency to a compatible one-dimensional array, starting at the specified index of the target array
 - public void CopyTo(T[] array, int arrayIndex, int minFrequency, int maxFrequency): copies the a range of items from the FrequencyTable<T> within the specified inclusive frequency range to a compatible one-dimensional array, starting at the specified index of the target array
+- public IEnumerator<T> GetEnumerator(): returns an enumerator that iterates through the FrequencyTable<T>
 - public IEnumerable<T> GetMax(): creates a shallow copy of all items with the maximum frequency in the source FrequencyTable<T>
 - public IEnumerable<T> GetMin(): creates a shallow copy of all items with the minimum frequency in the source
 - public bool Remove(T item): removes an item from the FrequencyTable<T>

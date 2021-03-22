@@ -728,6 +728,78 @@ namespace Shipstone.SystemTest
 #endregion
 #endregion
 
+#region GetEnumerator tests
+        [TestMethod]
+        public void TestGetEnumerator_Disposed()
+        {
+            using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
+            {
+                enumerator.Dispose();
+                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.MoveNext());
+                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.Reset());
+                int current = enumerator.Current;
+            }
+        }
+
+        [TestMethod]
+        public void TestGetEnumerator_Empty()
+        {
+            const int MIN = 10, MAX = 20;
+            int[] sample = FrequencyTableTest._Sample(MIN, MAX);
+            this._Table.AddRange(sample);
+
+            using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
+            {
+                this._Table.Add(MIN + MAX);
+                int current = enumerator.Current;
+                const String MESSAGE = "The collection was modified after the enumerator was created.";
+                Exception ex = Assert.ThrowsException<InvalidOperationException>(() => enumerator.MoveNext());
+                Assert.AreEqual(MESSAGE, ex.Message);
+                ex = Assert.ThrowsException<InvalidOperationException>(() => enumerator.Reset());
+                Assert.AreEqual(MESSAGE, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void TestGetEnumerator_Modified()
+        {
+            using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
+            {
+                enumerator.Dispose();
+                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.MoveNext());
+                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.Reset());
+                int current = enumerator.Current;
+            }
+        }
+
+        [TestMethod]
+        public void TestGetEnumerator_NotEmpty()
+        {
+            int[] sample = FrequencyTableTest._Sample();
+            this._Table.AddRange(sample);
+            FrequencyTable<int> newTable = new();
+
+            using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
+            {
+                while (enumerator.MoveNext())
+                {
+                    newTable.Add(enumerator.Current);
+                }
+            }
+            
+            Assert.AreEqual(this._Table.Count, newTable.Count);
+            Assert.AreEqual(this._Table.Frequencies.Count(), newTable.Frequencies.Count());
+            Assert.AreEqual(this._Table.Items.Count(), newTable.Items.Count());
+            Assert.AreEqual(this._Table.MaxFrequency, newTable.MaxFrequency);
+            Assert.AreEqual(this._Table.MinFrequency, newTable.MinFrequency);
+
+            foreach (int item in this._Table)
+            {
+                Assert.AreEqual(this._Table[item], newTable[item]);
+            }
+        }
+#endregion
+
 #region Get Range functionality
 #region GetMax tests
         [TestMethod]

@@ -13,6 +13,7 @@ namespace Shipstone.System.Collections
         private const String _ClassName = "FrequencyTable<T>";
 
         private int _Count;
+        private readonly ICollection<FrequencyTable<T>.Enumerator> _Enumerators;
         private readonly IList<int> _Frequencies;
         private readonly IList<T> _Items;
         private int _MaxFrequency;
@@ -108,6 +109,7 @@ namespace Shipstone.System.Collections
                 }
 
                 this._ResetMaxMin();
+                this._NotifyEnumerators();
             }
         }
 #endregion
@@ -118,6 +120,7 @@ namespace Shipstone.System.Collections
         /// </summary>
         public FrequencyTable()
         {
+            this._Enumerators = new LinkedList<FrequencyTable<T>.Enumerator>();
             this._Frequencies = new List<int>();
             this._Items = new List<T>();
         }
@@ -148,6 +151,7 @@ namespace Shipstone.System.Collections
             }
 
             this._Count = table._Count;
+            this._Enumerators = new LinkedList<FrequencyTable<T>.Enumerator>();
             this._Frequencies = new List<int>(table._Frequencies);
             this._Items = new List<T>(table._Items);
             this._MaxFrequency = table._MaxFrequency;
@@ -173,6 +177,7 @@ namespace Shipstone.System.Collections
 
             this._Count += frequency;
             this._ResetMaxMin();
+            this._NotifyEnumerators();
         }
 
         private void _CopyTo(T[] array, int arrayIndex, int minFrequency, int maxFrequency)
@@ -212,6 +217,14 @@ namespace Shipstone.System.Collections
             return sum;
         }
 
+        private void _NotifyEnumerators()
+        {
+            foreach (FrequencyTable<T>.Enumerator enumerator in this._Enumerators)
+            {
+                enumerator._IsModified = true;
+            }
+        }
+
         private bool _Remove(T item, int frequency)
         {
             int index = this._Items.IndexOf(item);
@@ -239,6 +252,7 @@ namespace Shipstone.System.Collections
 
             this._Count -= frequency;
             this._ResetMaxMin();
+            this._NotifyEnumerators();
             return true;
         }
 
@@ -317,6 +331,7 @@ namespace Shipstone.System.Collections
             this._Count = this._MaxFrequency = this._MinFrequency = 0;
             this._Frequencies.Clear();
             this._Items.Clear();
+            this._NotifyEnumerators();
         }
 
         /// <summary>
@@ -501,8 +516,13 @@ namespace Shipstone.System.Collections
         public void ForEach(Action<T> action, int minFrequency, int maxFrequency) => throw new NotImplementedException();
 #endregion
 
-        public IEnumerator<T> GetEnumerator() => throw new NotImplementedException();
-        IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerator{T}" /> for the <see cref="FrequencyTable{T}" />.</returns>
+        public IEnumerator<T> GetEnumerator() => new FrequencyTable<T>.Enumerator(this);
+
+        IEnumerator IEnumerable.GetEnumerator() => new FrequencyTable<T>.Enumerator(this);
 
 #region Range functionality
         /// <summary>
