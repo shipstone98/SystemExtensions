@@ -172,7 +172,13 @@ namespace Shipstone.System.Collections
             this._Items.Clear();
         }
 
-        public bool Contains(T item) => throw new NotImplementedException();
+        /// <summary>
+        /// Determines whether an item is in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
+        /// <returns><c>true</c> if <c><paramref name="item" /></c> is found in the <see cref="FrequencyTable{T}" />; otherwise, <c>false</c>.</returns>
+        public bool Contains(T item) => this._Items.Contains(item);
+
         public bool ContainsRange(IEnumerable<T> collection) => throw new NotImplementedException();
         public void CopyTo(T[] array) => throw new NotImplementedException();
         public void CopyTo(T[] array, int arrayIndex) => throw new NotImplementedException();

@@ -16,7 +16,7 @@ namespace Shipstone.SystemTest
 
         private FrequencyTable<int> _Table;
 
-        static FrequencyTableTest() => FrequencyTableTest._Random = new Random();
+        static FrequencyTableTest() => FrequencyTableTest._Random = new();
 
         private static int[] _Sample() => FrequencyTableTest._Sample(0, Int32.MaxValue);
         private static int[] _Sample(out Dictionary<int, int> dictionary) => FrequencyTableTest._Sample(0, Int32.MaxValue, out dictionary);
@@ -25,7 +25,7 @@ namespace Shipstone.SystemTest
         private static int[] _Sample(int min, int max, out Dictionary<int, int> dictionary)
         {
             int[] sample = new int[FrequencyTableTest._SampleLength];
-            dictionary = new Dictionary<int, int>();
+            dictionary = new();
 
             for (int i = 0; i < sample.Length; i ++)
             {
@@ -47,7 +47,7 @@ namespace Shipstone.SystemTest
         }
 
         [TestInitialize]
-        public void Initialize() => this._Table = new FrequencyTable<int>();
+        public void Initialize() => this._Table = new();
 
 #region Item tests
         public void TestItem_InvalidRange()
@@ -173,7 +173,7 @@ namespace Shipstone.SystemTest
         [TestMethod]
         public void TestConstructor_IEnumerable_Empty()
         {
-            this._Table = new FrequencyTable<int>(Array.Empty<int>());
+            this._Table = new(Array.Empty<int>());
             Assert.AreEqual(0, this._Table.Count);
             Assert.AreEqual(0, this._Table.Frequencies.Count());
             Assert.AreEqual(0, this._Table.Items.Count());
@@ -183,7 +183,7 @@ namespace Shipstone.SystemTest
         public void TestConstructor_IEnumerable_NotEmpty()
         {
             int[] sample = FrequencyTableTest._Sample(1, 10, out Dictionary<int, int> dictionary);
-            this._Table = new FrequencyTable<int>(sample);
+            this._Table = new(sample);
             Assert.AreEqual(sample.Length, this._Table.Count);
 
             for (int i = 0; i < sample.Length; i ++)
@@ -200,7 +200,7 @@ namespace Shipstone.SystemTest
         [TestMethod]
         public void TestConstructor_FrequencyTable_Empty()
         {
-            this._Table = new FrequencyTable<int>(this._Table);
+            this._Table = new(this._Table);
             Assert.AreEqual(0, this._Table.Count);
             Assert.AreEqual(0, this._Table.Frequencies.Count());
             Assert.AreEqual(0, this._Table.Items.Count());
@@ -210,8 +210,8 @@ namespace Shipstone.SystemTest
         public void TestConstructor_FrequencyTable_NotEmpty()
         {
             int[] sample = FrequencyTableTest._Sample(1, 10, out Dictionary<int, int> dictionary);
-            this._Table = new FrequencyTable<int>(sample);
-            FrequencyTable<int> table = new FrequencyTable<int>(this._Table);
+            this._Table = new(sample);
+            FrequencyTable<int> table = new(this._Table);
             Assert.AreEqual(this._Table.Count, table.Count);
             Assert.AreEqual(this._Table.Frequencies.Count(), table.Frequencies.Count());
             Assert.AreEqual(this._Table.Items.Count(), table.Items.Count());
@@ -246,7 +246,7 @@ namespace Shipstone.SystemTest
         public void TestClear_NotEmpty_MultipleItems()
         {
             int[] sample = FrequencyTableTest._Sample();
-            this._Table = new FrequencyTable<int>(sample);
+            this._Table = new(sample);
             this._Table.Clear();
             Assert.AreEqual(0, this._Table.Count);
             Assert.AreEqual(0, this._Table.Frequencies.Count());
@@ -263,6 +263,45 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(0, this._Table.Frequencies.Count());
             Assert.AreEqual(0, this._Table.Items.Count());
         }
-#endregion    
+#endregion
+
+#region Contains tests
+        [TestMethod]
+        public void TestContains_Empty()
+        {
+            Assert.IsFalse(this._Table.Contains(10));
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.AreEqual(0, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestContains_NotEmpty_Contains()
+        {
+            int[] sample = FrequencyTableTest._Sample(10, 20, out Dictionary<int, int> dictionary);
+            this._Table = new(sample);
+            
+            foreach (int item in dictionary.Keys)
+            {
+                Assert.IsTrue(this._Table.Contains(item));
+            }
+
+            Assert.AreEqual(sample.Length, this._Table.Count);
+            Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
+            Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestContains_NotEmpty_NotContains()
+        {
+            const int MAX = 20;
+            int[] sample = FrequencyTableTest._Sample(10, MAX, out Dictionary<int, int> dictionary);
+            this._Table = new(sample);
+            Assert.IsFalse(this._Table.Contains(MAX + 1));
+            Assert.AreEqual(sample.Length, this._Table.Count);
+            Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
+            Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+        }
+#endregion
     }
 }
