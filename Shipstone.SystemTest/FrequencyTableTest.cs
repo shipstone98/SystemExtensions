@@ -303,5 +303,68 @@ namespace Shipstone.SystemTest
             Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
         }
 #endregion
+
+#region ContainsAll tests
+        [TestMethod]
+        public void TestContainsAll_Empty()
+        {
+            int[] sample = FrequencyTableTest._Sample();
+            Assert.IsFalse(this._Table.ContainsAll(sample));
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table.Frequencies.Count());
+            Assert.AreEqual(0, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestContainsAll_NotEmpty_ContainsAll()
+        {
+            int[] sample = FrequencyTableTest._Sample(10, 20, out Dictionary<int, int> dictionary);
+            this._Table = new(sample);
+            
+            foreach (int item in dictionary.Keys)
+            {
+                Assert.IsTrue(this._Table.ContainsAll(sample));
+            }
+
+            Assert.AreEqual(sample.Length, this._Table.Count);
+            Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
+            Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestContainsAll_NotEmpty_ContainsSome()
+        {
+            const int MAX = 20;
+            int[] sample = FrequencyTableTest._Sample(10, MAX, out Dictionary<int, int> dictionary);
+            int[] largerSample = new int[sample.Length + 1];
+            Array.Copy(sample, largerSample, sample.Length);
+            largerSample[sample.Length] = MAX;
+            this._Table = new(sample);
+            
+            foreach (int item in dictionary.Keys)
+            {
+                Assert.IsFalse(this._Table.ContainsAll(largerSample));
+            }
+
+            Assert.AreEqual(sample.Length, this._Table.Count);
+            Assert.AreEqual(dictionary.Count, this._Table.Frequencies.Count());
+            Assert.AreEqual(dictionary.Count, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestContainsAll_NotEmpty_ContainsNone()
+        {
+            const int MAX = 20;
+            int[] sample = FrequencyTableTest._Sample(10, MAX, out Dictionary<int, int> dictionary);
+            this._Table[MAX] = MAX;
+            Assert.IsFalse(this._Table.ContainsAll(sample));
+            Assert.AreEqual(MAX, this._Table.Count);
+            Assert.AreEqual(1, this._Table.Frequencies.Count());
+            Assert.AreEqual(1, this._Table.Items.Count());
+        }
+
+        [TestMethod]
+        public void TestContainsAll_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.ContainsAll(null));
+#endregion
     }
 }

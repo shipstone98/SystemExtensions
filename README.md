@@ -10,19 +10,20 @@ Extension classes to .NET Standard 2.0.
 
 ### FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
 #### Constructors
-- public FrequencyTable(): initializes a new instance of the <see cref="FrequencyTable{T}" /> class that is empty
-- public FrequencyTable(IEnumerable<T> collection): initializes a new instance of the <see cref="FrequencyTable{T}" /> class that contains items copied from the specified collection
-- public FrequencyTable(FrequencyTable<T> table): initializes a new instance of the <see cref="FrequencyTable{T}" /> class that contains items copied from the specified frequency table
+- public FrequencyTable(): initializes a new instance of the FrequencyTable<T> class that is empty
+- public FrequencyTable(IEnumerable<T> collection): initializes a new instance of the FrequencyTable<T> class that contains items copied from the specified collection
+- public FrequencyTable(FrequencyTable<T> table): initializes a new instance of the FrequencyTable<T> class that contains items copied from the specified frequency table
 
 #### Properties
-- public int Count { get; }: gets the number of items contained in the <see cref="FrequencyTable{T}" />
-- public IEnumerable<int> Frequencies { get; }: gets a collection containing the frequencies of all items contained in the <see cref="FrequencyTable{T}" />
-- public IEnumerable<T> Items { get; }: gets a collection containing all items contained in the <see cref="FrequencyTable{T}" />
+- public int Count { get; }: gets the number of items contained in the FrequencyTable<T>
+- public IEnumerable<int> Frequencies { get; }: gets a collection containing the frequencies of all items contained in the FrequencyTable<T>
+- public IEnumerable<T> Items { get; }: gets a collection containing all items contained in the FrequencyTable<T>
 - public T this[int frequency] { get; set; }: gets or sets the frequency of the specified item
 
 #### Methods
-- public void Clear(): removes all items from the <see cref="FrequencyTable{T}" />
-- public bool Contains(T item): determines whether an item is in the <see cref="FrequencyTable{T}" />
+- public void Clear(): removes all items from the FrequencyTable<T>
+- public bool Contains(T item): determines whether an item is in the FrequencyTable<T>
+- public bool ContainsAll(IEnumerable<T> collection): determines whether all items contained in the specified collection are in the FrequencyTable<T>
 
 #### Explicit Interface Implementations
 - bool ICollection.IsSynchronized

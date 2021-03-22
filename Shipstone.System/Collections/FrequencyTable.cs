@@ -179,7 +179,25 @@ namespace Shipstone.System.Collections
         /// <returns><c>true</c> if <c><paramref name="item" /></c> is found in the <see cref="FrequencyTable{T}" />; otherwise, <c>false</c>.</returns>
         public bool Contains(T item) => this._Items.Contains(item);
 
-        public bool ContainsRange(IEnumerable<T> collection) => throw new NotImplementedException();
+        /// <summary>
+        /// Determines whether all items contained in the specified collection are in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="collection">The collection to locate all items from in the <see cref="FrequencyTable{T}" />. The collection itself cannot be <c>null</c>, but it can contain items that are <c>null</c>, if <c><typeparamref name="T" /></c> is a reference type.</param>
+        /// <returns><c>true</c> if all items in <c><paramref name="collection" /></c> are found in the <see cref="FrequencyTable{T}" />; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public bool ContainsAll(IEnumerable<T> collection)
+        {
+            foreach (T item in collection ?? throw new ArgumentNullException(nameof (collection)))
+            {
+                if (!this._Items.Contains(item))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public void CopyTo(T[] array) => throw new NotImplementedException();
         public void CopyTo(T[] array, int arrayIndex) => throw new NotImplementedException();
         public void CopyTo(T[] array, int arrayIndex, int frequency) =>  throw new NotImplementedException();
