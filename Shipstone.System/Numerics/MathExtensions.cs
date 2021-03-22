@@ -33,6 +33,18 @@ namespace Shipstone.System.Numerics
         public static double Mean(IEnumerable<double> collection) => MathExtensions._Mean(collection ?? throw new ArgumentNullException(nameof (collection)));
 
         /// <summary>
+        /// Calculates the median average of values in the specified sorted collection.
+        /// </summary>
+        /// <param name="collection">An <see cref="IEnumerable{T}" /> of values to calculate the median average from. The collection must be sorted.</param>
+        /// <returns>The median average (middle) of values in the <c><paramref name="collection" /></c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public static double Median(IEnumerable<double> collection)
+        {
+            IEnumerable<double> median = EnumerableExtensions.Median<double>(collection);
+            return MathExtensions._Mean(median);
+        }
+
+        /// <summary>
         /// Calculates the modal average of values in the specified collection.
         /// </summary>
         /// <param name="collection">An <see cref="IEnumerable{T}" /> of values to calculate the modal average from.</param>

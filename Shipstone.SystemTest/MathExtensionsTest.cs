@@ -77,6 +77,28 @@ namespace Shipstone.SystemTest
         public void TestMean_Null() => Assert.ThrowsException<ArgumentNullException>(() => MathExtensions.Mean(null));
 
         [TestMethod]
+        public void TestMedian_Empty() => Assert.AreEqual(0, MathExtensions.Median(Array.Empty<double>()));
+
+        [TestMethod]
+        public void TestMedian_NotEmpty_AllZeroes()
+        {
+            double[] array = new double[10];
+            Assert.AreEqual(0, MathExtensions.Median(array));
+        }
+
+        [TestMethod]
+        public void TestMedian_NotEmpty_ValidSample()
+        {
+            Array.Sort(MathExtensionsTest._EvenSample);
+            Assert.AreEqual(0, MathExtensionsTest._CompareDouble(MathExtensionsTest._EvenSampleMedian, MathExtensions.Median(MathExtensionsTest._EvenSample)));
+            Array.Sort(MathExtensionsTest._OddSample);
+            Assert.AreEqual(0, MathExtensionsTest._CompareDouble(MathExtensionsTest._OddSampleMedian, MathExtensions.Median(MathExtensionsTest._OddSample)));
+        }
+
+        [TestMethod]
+        public void TestMedian_Null() => Assert.ThrowsException<ArgumentNullException>(() => MathExtensions.Median(null));
+
+        [TestMethod]
         public void TestMode_Empty() => Assert.AreEqual(0, MathExtensions.Mode(Array.Empty<double>()));
 
         [TestMethod]

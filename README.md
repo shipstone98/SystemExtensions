@@ -7,7 +7,12 @@ Extension classes to .NET Standard 2.0.
 - Shipstone.System.Numerics: contains numeric and mathematical types that complement the numeric primitives, such as Byte, Double and Int32, that are defined by .NET
 
 ## Shipstone.System.Collections
+- public static class EnumerableExtensions: provides a set of static (Shared in Visual Basic) methods for querying objects that implement IEnumerable<T>
 - public class FrequencyTable<T>: represents a strongly types frequency table of items
+
+### EnumerableExtensions
+#### Methods
+- public static IEnumerable<T> Median(IEnumerable<T> source): returns the median value(s) in the specified sorted collection
 
 ### FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
 #### Remarks
@@ -62,4 +67,5 @@ Extension classes to .NET Standard 2.0.
 ### MathExtensions
 #### Methods
 - public static double Mean(IEnumerable<double> collection): calculates the mean average of values in the specified collection
+- public static double Mean(IEnumerable<double> collection): calculates the median average of values in the specified sorted collection
 - public static double Mode(IEnumerable<double> collection): calculates the modal average of values in the specified collection
