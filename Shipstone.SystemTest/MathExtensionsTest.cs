@@ -8,15 +8,28 @@ namespace Shipstone.SystemTest
     [TestClass]
     public class MathExtensionsTest
     {
-        private static readonly double[] _Sample;
-        private const double _SampleLowerQuartile = -8.78;
-        private const double _SampleMean = 1.0166666666667;
-        private const double _SampleMedian = 7.8;
-        private const double _SampleMode = 4.37;
-        private const double _SampleUpperQuartile = 9.285;
-        private const double _SampleVariance = 531.76417777778;
+        private static readonly double[] _EvenSample;
+        private const double _EvenSampleLowerQuartile = -8.78;
+        private const double _EvenSampleMean = -4.01875;
+        private const double _EvenSampleMedian = 3.92;
+        private const double _EvenSampleMode = 4.37;
+        private const double _EvenSampleUpperQuartile = 8.7;
+        private const double _EvenSampleVariance = 422.898184;
+        private static readonly double[] _OddSample;
+        private const double _OddSampleLowerQuartile = -8.78;
+        private const double _OddSampleMean = 1.0166666666667;
+        private const double _OddSampleMedian = 7.8;
+        private const double _OddSampleMode = 4.37;
+        private const double _OddSampleUpperQuartile = 9.285;
+        private const double _OddSampleVariance = 531.76417777778;
 
-        static MathExtensionsTest() => MathExtensionsTest._Sample = new double[] { 41.3, -17.6, 9.87, -49.7, 0.04, 0.04, 8.7, 7.8, 8.7 };
+        static MathExtensionsTest()
+        {
+            MathExtensionsTest._EvenSample = new double[] { -17.6, 9.87, -49.7, 0.04, 0.04, 8.7, 7.8, 8.7 };
+            MathExtensionsTest._OddSample = new double[MathExtensionsTest._EvenSample.Length + 1];
+            MathExtensionsTest._OddSample[0] = 41.3;
+            Array.Copy(MathExtensionsTest._EvenSample, 0, MathExtensionsTest._OddSample, 1, MathExtensionsTest._EvenSample.Length);
+        }
 
         internal static int _CompareDouble(double a, double b)
         {
@@ -54,9 +67,33 @@ namespace Shipstone.SystemTest
         }
 
         [TestMethod]
-        public void TestMean_NotEmpty_ValidSample() => Assert.AreEqual(0, MathExtensionsTest._CompareDouble(MathExtensionsTest._SampleMean, MathExtensions.Mean(MathExtensionsTest._Sample)));
+        public void TestMean_NotEmpty_ValidSample()
+        {
+            Assert.AreEqual(0, MathExtensionsTest._CompareDouble(MathExtensionsTest._EvenSampleMean, MathExtensions.Mean(MathExtensionsTest._EvenSample)));
+            Assert.AreEqual(0, MathExtensionsTest._CompareDouble(MathExtensionsTest._OddSampleMean, MathExtensions.Mean(MathExtensionsTest._OddSample)));
+        }
 
         [TestMethod]
         public void TestMean_Null() => Assert.ThrowsException<ArgumentNullException>(() => MathExtensions.Mean(null));
+
+        [TestMethod]
+        public void TestMode_Empty() => Assert.AreEqual(0, MathExtensions.Mode(Array.Empty<double>()));
+
+        [TestMethod]
+        public void TestMode_NotEmpty_AllZeroes()
+        {
+            double[] array = new double[10];
+            Assert.AreEqual(0, MathExtensions.Mode(array));
+        }
+
+        [TestMethod]
+        public void TestMode_NotEmpty_ValidSample()
+        {
+            Assert.AreEqual(0, MathExtensionsTest._CompareDouble(MathExtensionsTest._EvenSampleMode, MathExtensions.Mode(MathExtensionsTest._EvenSample)));
+            Assert.AreEqual(0, MathExtensionsTest._CompareDouble(MathExtensionsTest._OddSampleMode, MathExtensions.Mode(MathExtensionsTest._OddSample)));
+        }
+
+        [TestMethod]
+        public void TestMode_Null() => Assert.ThrowsException<ArgumentNullException>(() => MathExtensions.Mode(null));
     }
 }

@@ -62,3 +62,4 @@ Extension classes to .NET Standard 2.0.
 ### MathExtensions
 #### Methods
 - public static double Mean(IEnumerable<double> collection): calculates the mean average of values in the specified collection
+- public static double Mode(IEnumerable<double> collection): calculates the modal average of values in the specified collection
