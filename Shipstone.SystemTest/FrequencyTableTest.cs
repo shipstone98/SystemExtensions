@@ -797,6 +797,23 @@ namespace Shipstone.SystemTest
             {
                 Assert.AreEqual(this._Table[item], newTable[item]);
             }
+
+            int[] array = this._Table.ToArray();
+            ICollection<int> arrayCollection = new List<int>(array), enumerated = new List<int>(this._Table);
+            Assert.AreEqual(array.Length, enumerated.Count);
+
+            foreach (int item in enumerated)
+            {
+                Assert.IsTrue(arrayCollection.Remove(item));
+            }
+
+            foreach (int item in array)
+            {
+                Assert.IsTrue(enumerated.Remove(item));
+            }
+
+            Assert.AreEqual(0, arrayCollection.Count);
+            Assert.AreEqual(0, enumerated.Count);
         }
 #endregion
 
