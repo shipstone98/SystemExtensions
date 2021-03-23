@@ -49,28 +49,33 @@ namespace Shipstone.System.Numerics
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Matrix" /> class that is empty and contains the specified number of rows and columns.
-        /// </summary>
-        /// <param name="rows">The number of rows in the <see cref="Matrix" />.</param>
-        /// <param name="columns">The number of columns in the <see cref="Matrix" />.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="rows" /></c> is less than or equal to 0 -or- <c><paramref name="columns" /></c> is less than or equal to 0.</exception>
-        public Matrix(int rows, int columns)
+        private Matrix(int rows, int columns, bool check)
         {
-            if (rows <= 0)
+            if (check)
             {
-                throw new ArgumentOutOfRangeException(nameof (rows));
-            }
+                if (rows <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof (rows));
+                }
 
-            if (columns <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof (columns));
+                if (columns <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof (columns));
+                }
             }
 
             this._Array = new double[rows, columns];
             this._Columns = columns;
             this._Rows = rows;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Matrix" /> class that is empty and contains the specified number of rows and columns.
+        /// </summary>
+        /// <param name="rows">The number of rows in the <see cref="Matrix" />.</param>
+        /// <param name="columns">The number of columns in the <see cref="Matrix" />.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="rows" /></c> is less than or equal to 0 -or- <c><paramref name="columns" /></c> is less than or equal to 0.</exception>
+        public Matrix(int rows, int columns) : this(rows, columns, true) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Matrix" /> class that contains values copied from the specified matrix and has an equal number of rows and columns.
@@ -270,7 +275,28 @@ namespace Shipstone.System.Numerics
         public override String ToString() => this.ToString(false);
         public String ToString(bool includeBorders) => throw new NotImplementedException();
 
-        public static Matrix CreateIndentity(int size) => throw new NotImplementedException();
+        /// <summary>
+        /// Creates an identity matrix of the specified size.
+        /// </summary>
+        /// <param name="size">The number of rows and columns in the <see cref="Matrix" />.</param>
+        /// <returns>A new <see cref="Matrix" /> that is the identity matrix for its <c><paramref name="size" /></c>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="size" /></c> is less than or equal to 0.</exception>
+        public static Matrix CreateIndentity(int size)
+        {
+            if (size <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (size));
+            }
+
+            Matrix matrix = new Matrix(size, size, false);
+
+            for (int i = 0; i < size; i ++)
+            {
+                matrix._Array[i, i] = 1;
+            }
+
+            return matrix;
+        }
 
         /// <summary>
         /// Determines whether two matrices are equal.

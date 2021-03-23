@@ -222,6 +222,31 @@ namespace Shipstone.SystemTest
         public void TestAdd_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Add(null));
 #endregion
 
+        [TestMethod]
+        public void TestCreateIdentity_InvalidSize()
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Matrix.CreateIndentity(Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Matrix.CreateIndentity(-1));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => Matrix.CreateIndentity(0));
+        }
+
+        [TestMethod]
+        public void TestCreateIdentity_ValidSize()
+        {
+            const int SIZE = MatrixTest._Rows;
+            this._Matrix = Matrix.CreateIndentity(SIZE);
+            Assert.AreEqual(SIZE, this._Matrix.Columns);
+            Assert.AreEqual(SIZE, this._Matrix.Rows);
+
+            for (int i = 0; i < SIZE; i ++)
+            {
+                for (int j = 0; j < SIZE; j ++)
+                {
+                    Assert.AreEqual(i == j ? 1.0 : 0.0, this._Matrix[i, j]);
+                }
+            }
+        }
+
 #region Equals test
         [TestMethod]
         public void TestEquals_Equal()

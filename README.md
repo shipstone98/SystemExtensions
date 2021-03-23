@@ -90,6 +90,7 @@ Extension classes to .NET Standard 2.0.
 
 #### Methods
 - public Matrix Add(Matrix matrix): adds matrix to the current Matrix instance and returns the result as a new Matrix
+- public static Matrix CreateIdentity(int size): creates an identity matrix of the specified size.
 - public override bool Equals(Object obj): returns a value indicating whether this instance is equal to a specified object
 - public bool Equals(Matrix matrix): returns a value indicating whether this instance is equal to a specified Matrix
 - public override int GetHashCode(): returns the hash code for this instance
