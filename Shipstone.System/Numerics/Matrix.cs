@@ -262,7 +262,25 @@ namespace Shipstone.System.Numerics
             return hashCode ^ 31;
         }
 
-        public Matrix Multiply(double scalar) => throw new NotImplementedException();
+        /// <summary>
+        /// Multiples all entries in the current <see cref="Matrix" /> instance by <c><paramref name="scalar" /></c> and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="scalar">The <see cref="Double" /> value to multiply all entries in the current instance by.</param>
+        /// <returns>The result of the current <see cref="Matrix" /> instance multiplied by <c><paramref name="scalar" /></c>.</returns>
+        public Matrix Multiply(double scalar)
+        {
+            Matrix result = new Matrix(this._Rows, this._Columns);
+
+            for (int i = 0; i < result._Rows; i ++)
+            {
+                for (int j = 0; j < result._Columns; j ++)
+                {
+                    result._Array[i, j] = this._Array[i, j] * scalar;
+                }
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Multiples the current <see cref="Matrix" /> instance by <c><paramref name="matrix" /></c> and returns the result as a new <see cref="Matrix" />.
@@ -283,7 +301,7 @@ namespace Shipstone.System.Numerics
                 throw new ArgumentException($"Matrix.Columns is not equal to the number of rows in {nameof (matrix)}.");
             }
 
-            Matrix result = new Matrix(this._Rows, this._Columns);
+            Matrix result = new Matrix(this._Rows, matrix._Columns);
 
             for (int i = 0; i < result._Rows; i ++)
             {

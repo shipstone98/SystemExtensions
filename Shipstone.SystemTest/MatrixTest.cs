@@ -321,7 +321,6 @@ namespace Shipstone.SystemTest
         }
 #endregion
 
-#region Multiply tests
         [TestMethod]
         public void TestGetHashCode()
         {
@@ -336,6 +335,36 @@ namespace Shipstone.SystemTest
             }
 
             Assert.AreEqual(this._Matrix.GetHashCode(), matrix.GetHashCode());
+        }
+
+#region Multiply tests
+        [TestMethod]
+        public void TestMultiply_Scalar()
+        {
+            const double SCALAR = 4.7;
+            double[,] answers = new double[this._Matrix.Rows, this._Matrix.Columns];
+
+            for (int i = 0; i < this._Matrix.Rows; i ++)
+            {
+                for (int j = 0; j < this._Matrix.Columns; j ++)
+                {
+                    double n = MatrixTest._Random.NextDouble();
+                    this._Matrix[i, j] = n;
+                    answers[i, j] = n * SCALAR;
+                }
+            }
+
+            Matrix result = this._Matrix.Multiply(SCALAR);
+            Assert.AreEqual(result.Rows, this._Matrix.Rows);
+            Assert.AreEqual(result.Columns, this._Matrix.Columns);
+
+            for (int i = 0; i < result.Rows; i ++)
+            {
+                for (int j = 0; j < result.Columns; j ++)
+                {
+                    Assert.AreEqual(0, MathExtensionsTest._CompareDouble(answers[i, j], result[i, j]));
+                }
+            }
         }
 
         [TestMethod]

@@ -95,6 +95,7 @@ Extension classes to .NET Standard 2.0.
 - public override bool Equals(Object obj): returns a value indicating whether this instance is equal to a specified object
 - public bool Equals(Matrix matrix): returns a value indicating whether this instance is equal to a specified Matrix
 - public override int GetHashCode(): returns the hash code for this instance
+- public Matrix Multiply(double scalar): multiples all entries in the current Matrix instance by scalar and returns the result as a new Matrix
 - public Matrix Multiply(Matrix matrix): multiples the current Matrix instance by matrix and returns the result as a new Matrix
 - public Matrix Subtract(Matrix matrix): subtracts matrix from the current Matrix instance and returns the result as a new Matrix
 
