@@ -11,11 +11,11 @@ namespace Shipstone.System.Collections
         /// </summary>
         public class Node : IReadOnlyCollection<Tree<T>.Node>
         {
-            internal readonly ICollection<Tree<T>.Node> _ChildBranches;
+            internal readonly LinkedList<Tree<T>.Node> _ChildBranches;
             internal int _Count;
             internal Tree<T>.Node _RootBranch;
             internal Tree<T> _Tree;
-            private T _Value;
+            internal T _Value;
 
             /// <summary>
             /// Gets a collection containing all child branch nodes in the <see cref="Tree{T}.Node" />.
@@ -65,9 +65,8 @@ namespace Shipstone.System.Collections
                 this._Value = val;
             }
 
-            public IEnumerator<Tree<T>.Node> GetEnumerator() => this.GetEnumerator(false);
-            public IEnumerator<Tree<T>.Node> GetEnumerator(bool recursive) => throw new NotImplementedException();
-            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator(false);
+            public IEnumerator<Tree<T>.Node> GetEnumerator() => new Tree<T>.Node.Enumerator(this);
+            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
             public override String ToString() => this.ToString(false);
             public String ToString(bool recursive) => throw new NotImplementedException();
         }

@@ -68,10 +68,11 @@ Extension classes to .NET Standard 2.0.
 ### Tree<T> : ICollection<T>, ICollection<Tree<T>.Node>
 #### Constructors
 - public Tree(): initializes a new instance of the Tree<T> class that is empty
+- public Tree(Tree<T> tree): initializes a new instance of the Tree<T> class that contains nodes and values copied from tree
 
 #### Properties
 - public int Count { get; }: gets the number of branches in the Tree<T>
-- public Tree<T>.Node Root { get; }: gets the root Tree<T>.Node of the Tree<T>
+- public IEnumerable<Tree<T>.Node> RootBranches { get; }: gets a collection containing the root branch nodes of the Tree<T>
 
 ### Tree<T>.Node
 #### Constructors
