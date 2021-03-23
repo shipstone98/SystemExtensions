@@ -89,10 +89,12 @@ Extension classes to .NET Standard 2.0.
 - public double this[int row, int column]: gets or sets the value at the specified entry in the Matrix
 
 #### Methods
+- public Matrix Add(Matrix matrix): adds matrix to the current Matrix instance and returns the result as a new Matrix
 - public override bool Equals(Object obj): returns a value indicating whether this instance is equal to a specified object
 - public bool Equals(Matrix matrix): returns a value indicating whether this instance is equal to a specified Matrix
 - public override int GetHashCode(): returns the hash code for this instance
 - public Matrix Multiply(Matrix matrix): multiples the current Matrix instance by matrix and returns the result as a new Matrix
+- public Matrix Subtract(Matrix matrix): subtracts matrix from the current Matrix instance and returns the result as a new Matrix
 
 #### Operators
 - public static bool operator ==(Matrix a, Matrix b): determines whether two matrices are equal

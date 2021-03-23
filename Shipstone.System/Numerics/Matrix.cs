@@ -90,6 +90,50 @@ namespace Shipstone.System.Numerics
             Array.Copy(matrix._Array, this._Array, this._Rows * this._Columns);
         }
 
+        private Matrix _Add(Matrix matrix, bool subtract)
+        {
+            if (matrix is null)
+            {
+                throw new ArgumentNullException(nameof (matrix));
+            }
+
+            if (this._Rows != matrix._Rows)
+            {
+                throw new ArgumentException($"Matrix.Rows is not equal to the number of rows in {nameof (matrix)}.");
+            }
+
+            if (this._Columns != matrix._Columns)
+            {
+                throw new ArgumentException($"Matrix.Columns is not equal to the number of columns in {nameof (matrix)}.");
+            }
+
+            Matrix result = new Matrix(this._Rows, this._Columns);
+
+            if (subtract)
+            {
+                for (int i = 0; i < this._Rows; i ++)
+                {
+                    for (int j = 0; j < this._Columns; j ++)
+                    {
+                        result._Array[i, j] = this._Array[i, j] - matrix._Array[i, j];
+                    }
+                }
+            }
+
+            else
+            {
+                for (int i = 0; i < this._Rows; i ++)
+                {
+                    for (int j = 0; j < this._Columns; j ++)
+                    {
+                        result._Array[i, j] = this._Array[i, j] + matrix._Array[i, j];
+                    }
+                }
+            }
+
+            return result;
+        }
+
         private void _CheckColumnIndex(int column)
         {
             if (column < 0)
@@ -116,7 +160,14 @@ namespace Shipstone.System.Numerics
             }
         }
 
-        public Matrix Add(Matrix matrix) => throw new NotImplementedException();
+        /// <summary>
+        /// Adds <c><paramref name="matrix" /></c> to the current <see cref="Matrix" /> instance and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="matrix">The <see cref="Matrix" /> to add to the current instance.</param>
+        /// <returns>The result of <c><paramref name="matrix" /></c> added to the current <see cref="Matrix" /> instance.</returns>
+        /// <exception cref="ArgumentException"><see cref="Matrix.Rows" /> is not equal to the number of rows in <c><paramref name="matrix" /></c> -or- <see cref="Matrix.Columns" /> is not equal to the number of columns in <c><paramref name="matrix" /></c>.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
+        public Matrix Add(Matrix matrix) => this._Add(matrix, false);
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
@@ -177,7 +228,8 @@ namespace Shipstone.System.Numerics
         /// </summary>
         /// <param name="matrix">The <see cref="Matrix" /> to multiply the current instance by.</param>
         /// <returns>The result of the current <see cref="Matrix" /> instance multiplied by <c><paramref name="matrix" /></c>.</returns>
-        /// <exception><see cref="Matrix.Columns" /> is not equal to the number of rows in <c><paramref name="matrix" /></c>.
+        /// <exception cref="ArgumentException"><see cref="Matrix.Columns" /> is not equal to the number of rows in <c><paramref name="matrix" /></c>.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
         public Matrix Multiply(Matrix matrix)
         {
             if (matrix is null)
@@ -206,7 +258,15 @@ namespace Shipstone.System.Numerics
             return result;
         }
 
-        public Matrix Subtract(Matrix matrix) => throw new NotImplementedException();
+        /// <summary>
+        /// Subtracts <c><paramref name="matrix" /></c> from the current <see cref="Matrix" /> instance and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="matrix">The <see cref="Matrix" /> to subtract from the current instance.</param>
+        /// <returns>The result of <c><paramref name="matrix" /></c> subtracted from the current <see cref="Matrix" /> instance.</returns>
+        /// <exception cref="ArgumentException"><see cref="Matrix.Rows" /> is not equal to the number of rows in <c><paramref name="matrix" /></c> -or- <see cref="Matrix.Columns" /> is not equal to the number of columns in <c><paramref name="matrix" /></c>.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
+        public Matrix Subtract(Matrix matrix) => this._Add(matrix, true);
+
         public override String ToString() => this.ToString(false);
         public String ToString(bool includeBorders) => throw new NotImplementedException();
 

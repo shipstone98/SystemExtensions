@@ -159,6 +159,69 @@ namespace Shipstone.SystemTest
         public void TestConstructor_Matrix_Null() => Assert.ThrowsException<ArgumentNullException>(() => new Matrix(null));
 #endregion
 
+#region Add tests
+        [TestMethod]
+        public void TestAdd_EqualSize_Empty()
+        {
+            Matrix matrix = new(this._Matrix);
+            Matrix result = this._Matrix.Add(matrix);
+            Assert.AreEqual(result.Rows, this._Matrix.Rows);
+            Assert.AreEqual(result.Columns, this._Matrix.Columns);
+
+            for (int i = 0; i < result.Rows; i ++)
+            {
+                for (int j = 0; j < result.Columns; j ++)
+                {
+                    Assert.AreEqual(0.0, result[i, j]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestAdd_EqualSize_NotEmpty()
+        {
+            double[,] answers = new double[this._Matrix.Rows, this._Matrix.Columns];
+            Matrix matrix = new(this._Matrix);
+
+            for (int i = 0; i < this._Matrix.Rows; i ++)
+            {
+                for (int j = 0; j < this._Matrix.Columns; j ++)
+                {
+                    double n = MatrixTest._Random.NextDouble();
+                    this._Matrix[i, j] = n;
+                    matrix[i, j] = 2 * n;
+                    answers[i, j] = 3 * n;
+                }
+            }
+
+            Matrix result = this._Matrix.Add(matrix);
+            Assert.AreEqual(result.Rows, this._Matrix.Rows);
+            Assert.AreEqual(result.Columns, this._Matrix.Columns);
+
+            for (int i = 0; i < result.Rows; i ++)
+            {
+                for (int j = 0; j < result.Columns; j ++)
+                {
+                    Assert.AreEqual(answers[i, j], result[i, j]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestAdd_NotEqualSize()
+        {
+            Matrix matrix = new Matrix(this._Matrix.Rows + 1, this._Matrix.Columns);
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Add(matrix));
+            Assert.AreEqual("Matrix.Rows is not equal to the number of rows in matrix.", ex.Message);
+            matrix = new Matrix(this._Matrix.Rows, this._Matrix.Columns + 1);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Add(matrix));
+            Assert.AreEqual("Matrix.Columns is not equal to the number of columns in matrix.", ex.Message);
+        }
+
+        [TestMethod]
+        public void TestAdd_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Add(null));
+#endregion
+
 #region Equals test
         [TestMethod]
         public void TestEquals_Equal()
@@ -211,6 +274,7 @@ namespace Shipstone.SystemTest
         }
 #endregion
 
+#region Multiply tests
         [TestMethod]
         public void TestGetHashCode()
         {
@@ -313,5 +377,69 @@ namespace Shipstone.SystemTest
                 }
             }
         }
+#endregion
+
+#region Subtract tests
+        [TestMethod]
+        public void TestSubtract_EqualSize_Empty()
+        {
+            Matrix matrix = new(this._Matrix);
+            Matrix result = this._Matrix.Subtract(matrix);
+            Assert.AreEqual(result.Rows, this._Matrix.Rows);
+            Assert.AreEqual(result.Columns, this._Matrix.Columns);
+
+            for (int i = 0; i < result.Rows; i ++)
+            {
+                for (int j = 0; j < result.Columns; j ++)
+                {
+                    Assert.AreEqual(0.0, result[i, j]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestSubtract_EqualSize_NotEmpty()
+        {
+            double[,] answers = new double[this._Matrix.Rows, this._Matrix.Columns];
+            Matrix matrix = new(this._Matrix);
+
+            for (int i = 0; i < this._Matrix.Rows; i ++)
+            {
+                for (int j = 0; j < this._Matrix.Columns; j ++)
+                {
+                    double n = MatrixTest._Random.NextDouble();
+                    this._Matrix[i, j] = n;
+                    matrix[i, j] = 2 * n;
+                    answers[i, j] = n * -1;
+                }
+            }
+
+            Matrix result = this._Matrix.Subtract(matrix);
+            Assert.AreEqual(result.Rows, this._Matrix.Rows);
+            Assert.AreEqual(result.Columns, this._Matrix.Columns);
+
+            for (int i = 0; i < result.Rows; i ++)
+            {
+                for (int j = 0; j < result.Columns; j ++)
+                {
+                    Assert.AreEqual(answers[i, j], result[i, j]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestSubtract_NotEqualSize()
+        {
+            Matrix matrix = new Matrix(this._Matrix.Rows + 1, this._Matrix.Columns);
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Subtract(matrix));
+            Assert.AreEqual("Matrix.Rows is not equal to the number of rows in matrix.", ex.Message);
+            matrix = new Matrix(this._Matrix.Rows, this._Matrix.Columns + 1);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Subtract(matrix));
+            Assert.AreEqual("Matrix.Columns is not equal to the number of columns in matrix.", ex.Message);
+        }
+
+        [TestMethod]
+        public void TestSubtract_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Subtract(null));
+#endregion
     }
 }
