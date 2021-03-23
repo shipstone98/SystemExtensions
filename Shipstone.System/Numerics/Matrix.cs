@@ -211,6 +211,42 @@ namespace Shipstone.System.Numerics
         public Matrix Add(Matrix matrix) => this._Add(matrix, false);
 
         /// <summary>
+        /// Calculates the direct sum of the current <see cref="Matrix" /> instance and <c><paramref name="matrix" /></c> and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="matrix">The <see cref="Matrix" /> to add to the current instance.</param>
+        /// <returns>The result of the direct sum of the current <see cref="Matrix" /> instance and <c><paramref name="matrix" /></c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
+        public Matrix AddDirect(Matrix matrix)
+        {
+            if (matrix is null)
+            {
+                throw new ArgumentNullException(nameof (matrix));
+            }
+
+            Matrix result = new Matrix(this._Rows + matrix._Rows, this._Columns + matrix._Columns);
+
+            for (int i = 0; i < this._Rows; i ++)
+            {
+                for (int j = 0; j < this._Columns; j ++)
+                {
+                    result._Array[i, j] = this._Array[i, j];
+                }
+            }
+
+            for (int i = 0; i < matrix._Rows; i ++)
+            {
+                int rowOffset = i + this._Rows;
+
+                for (int j = 0; j < matrix._Columns; j ++)
+                {
+                    result._Array[rowOffset, j + this._Columns] = matrix._Array[i, j];
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
         /// <param name="obj">An object to compare with this instance.</param>

@@ -242,6 +242,45 @@ namespace Shipstone.SystemTest
 
         [TestMethod]
         public void TestAdd_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Add(null));
+
+        [TestMethod]
+        public void TestAddDirect_NotNull()
+        {
+            Matrix a = new Matrix(2, 3), b = new Matrix(2, 2);
+            a[0, 0] = 1;
+            a[0, 1] = 3;
+            a[0, 2] = 2;
+            a[1, 0] = 2;
+            a[1, 1] = 3;
+            a[1, 2] = 1;
+            b[0, 0] = 1;
+            b[0, 1] = 6;
+            b[1, 1] = 1;
+            Matrix c = a.AddDirect(b);
+            Assert.AreEqual(4, c.Rows);
+            Assert.AreEqual(5, c.Columns);
+            double[,] answers = new double[4, 5];
+            answers[0, 0] = 1;
+            answers[0, 1] = 3;
+            answers[0, 2] = 2;
+            answers[1, 0] = 2;
+            answers[1, 1] = 3;
+            answers[1, 2] = 1;
+            answers[2, 3] = 1;
+            answers[2, 4] = 6;
+            answers[3, 4] = 1;
+
+            for (int i = 0; i < c.Rows; i ++)
+            {
+                for (int j = 0; j < c.Columns; j ++)
+                {
+                    Assert.AreEqual(answers[i, j], c[i, j]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestAddDirect_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.AddDirect(null));
 #endregion
 
         [TestMethod]
