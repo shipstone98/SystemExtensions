@@ -12,7 +12,9 @@ Extension classes to .NET Standard 2.0.
 
 ### EnumerableExtensions
 #### Methods
-- public static IEnumerable<T> Median(IEnumerable<T> source): returns the median value(s) in the specified sorted collection
+- public static int CompareTo(this IEnumerable<T> source, IEnumerable<T> collection): compares all elements in this collection with the specified IEnumerable<T> using the default comparer for type T
+- public static int CompareTo(this IEnumerable<T> source, IEnumerable<T> collection, IComparer<T> comparer): compares all elements in this collection with the specified IEnumerable<T> using the specified IComparer<T>
+- public static IEnumerable<T> Median(this IEnumerable<T> source): returns the median value(s) in the specified sorted collection
 
 ### FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
 #### Remarks
