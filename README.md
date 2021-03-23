@@ -85,6 +85,7 @@ Extension classes to .NET Standard 2.0.
 
 #### Properties
 - public int Columns: gets the number of columns in the Matrix
+- public bool IsIdentity: gets a value indicating whether the Matrix is the identity matrix
 - public int Rows: gets the number of rows in the Matrix
 - public double this[int row, int column]: gets or sets the value at the specified entry in the Matrix
 

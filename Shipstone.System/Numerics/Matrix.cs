@@ -17,7 +17,43 @@ namespace Shipstone.System.Numerics
         /// <value>The number of columns in the <see cref="Matrix" />.</value>
         public int Columns => this._Columns;
 
-        public bool IsIdentity => throw new NotImplementedException();
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Matrix" /> is the identity matrix.
+        /// </summary>
+        /// <value><c>true</c> if the <see cref="Matrix" /> is the identity matrix; otherwise, <c>false</c>.</value>
+        public bool IsIdentity
+        {
+            get
+            {
+                if (this._Rows != this._Columns)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < this._Rows; i ++)
+                {
+                    for (int j = 0; j < this._Columns; j ++)
+                    {
+                        double n = this._Array[i, j];
+
+                        if (i == j)
+                        {
+                            if (n != 1)
+                            {
+                                return false;
+                            }
+                        }
+
+                        else if (n != 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+        }
 
         /// <summary>
         /// Gets the number of rows in the <see cref="Matrix" />.

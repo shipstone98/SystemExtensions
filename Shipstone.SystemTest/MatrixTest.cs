@@ -37,6 +37,28 @@ namespace Shipstone.SystemTest
         public void Initialize() => this._Matrix = new Matrix(MatrixTest._Rows, MatrixTest._Columns);
 
         [TestMethod]
+        public void TestIsIdentity_EqualSize_Identity()
+        {
+            this._Matrix = Matrix.CreateIndentity(MatrixTest._Rows);
+            Assert.IsTrue(this._Matrix.IsIdentity);
+        }
+
+        [TestMethod]
+        public void TestIsIdentity_EqualSize_NotIdentity()
+        {
+            this._Matrix = Matrix.CreateIndentity(MatrixTest._Rows);
+            this._Matrix[0, 0] = 0;
+            Assert.IsFalse(this._Matrix.IsIdentity);
+        }
+
+        [TestMethod]
+        public void TestIsIdentity_NotEqualSize()
+        {
+            this._Matrix = new Matrix(MatrixTest._Rows, MatrixTest._Rows + 1);
+            Assert.IsFalse(this._Matrix.IsIdentity);
+        }
+
+        [TestMethod]
         public void TestItem_InvalidRange()
         {
             const String COLUMN_HIGH = "column is greater than or equal to Matrix.Columns.";
