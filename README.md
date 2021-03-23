@@ -58,9 +58,9 @@ Extension classes to .NET Standard 2.0.
 - public T[] ToArray(int minFrequency, int maxFrequency): copies a range of items of the FrequencyTable<T> within the specified inclusive frequency range to a new array
 
 #### Explicit Interface Implementations
-- bool ICollection.IsSynchronized
-- Object ICollection.SyncRoot
-- bool ICollection<T>.IsReadOnly
+- bool ICollection.IsSynchronized { get; }
+- Object ICollection.SyncRoot { get; }
+- bool ICollection<T>.IsReadOnly { get; }
 - IEnumerator IEnumerable.GetEnumerator()
 
 ## Shipstone.System.Numerics
@@ -84,10 +84,10 @@ Extension classes to .NET Standard 2.0.
 - public Matrix(Matrix matrix): initializes a new instance of the Matrix class that contains values copied from the specified matrix and has an equal number of rows and columns
 
 #### Properties
-- public int Columns: gets the number of columns in the Matrix
-- public bool IsIdentity: gets a value indicating whether the Matrix is the identity matrix
-- public int Rows: gets the number of rows in the Matrix
-- public double this[int row, int column]: gets or sets the value at the specified entry in the Matrix
+- public int Columns { get; }: gets the number of columns in the Matrix
+- public bool IsIdentity { get; }: gets a value indicating whether the Matrix is the identity matrix
+- public int Rows { get; }: gets the number of rows in the Matrix
+- public double this[int row, int column] { get; set; }: gets or sets the value at the specified entry in the Matrix
 
 #### Methods
 - public Matrix Add(Matrix matrix): adds matrix to the current Matrix instance and returns the result as a new Matrix
