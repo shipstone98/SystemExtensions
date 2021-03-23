@@ -9,6 +9,8 @@ Extension classes to .NET Standard 2.0.
 ## Shipstone.System.Collections
 - public static class EnumerableExtensions: provides a set of static (Shared in Visual Basic) methods for querying objects that implement IEnumerable<T>
 - public class FrequencyTable<T>: represents a strongly types frequency table of items
+- public class Tree<T>: represents a tree with zero or more branches
+- public class Tree<T>.Node: represents a branch node in a Tree<T>
 
 ### EnumerableExtensions
 #### Methods
@@ -63,6 +65,26 @@ Extension classes to .NET Standard 2.0.
 - bool ICollection<T>.IsReadOnly
 - IEnumerator IEnumerable.GetEnumerator()
 
+### Tree<T> : ICollection<T>, ICollection<Tree<T>.Node>
+#### Constructors
+- public Tree(): initializes a new instance of the Tree<T> class that is empty
+
+#### Properties
+- public int Count { get; }: gets the number of branches in the Tree<T>
+- public Tree<T>.Node Root { get; }: gets the root Tree<T>.Node of the Tree<T>
+
+### Tree<T>.Node
+#### Constructors
+- public Tree<T>.Node(): initializes a new instance of the Tree<T>.Node class that contains the default value for type T with no child branches
+- public Tree<T>.Node(T val): initializes a new instance of the Tree<T>.Node class that contains the specified value with no child branches
+
+#### Properties
+- public IEnumerable<Tree<T>.Node> ChildBranches { get; }: gets a collection containing all child branch nodes in the Tree<T>.Node
+- public int Count { get; }: gets the number of branches in the Tree<T>.Node
+- public Tree<T>.Node RootBranch { get; }: gets the root branch of the Tree<T>.Node
+- public Tree<T> Tree { get; }: gets the Tree<T> the Tree<T>.Node is a branch of
+- public T Value { get; set; }: gets or sets the value of the Tree<T>.Node
+
 ## Shipstone.System.Numerics
 - public static class MathExtensions: provides static methods for common mathematical and statistical functions
 - public class Matrix: represents a matrix of specified size
@@ -84,10 +106,10 @@ Extension classes to .NET Standard 2.0.
 - public Matrix(Matrix matrix): initializes a new instance of the Matrix class that contains values copied from the specified matrix and has an equal number of rows and columns
 
 #### Properties
-- public int Columns: gets the number of columns in the Matrix
-- public bool IsIdentity: gets a value indicating whether the Matrix is the identity matrix
-- public int Rows: gets the number of rows in the Matrix
-- public double this[int row, int column]: gets or sets the value at the specified entry in the Matrix
+- public int Columns { get; }: gets the number of columns in the Matrix
+- public bool IsIdentity { get; }: gets a value indicating whether the Matrix is the identity matrix
+- public int Rows { get; }: gets the number of rows in the Matrix
+- public double this[int row, int column] { get; set; }: gets or sets the value at the specified entry in the Matrix
 
 #### Methods
 - public Matrix Add(Matrix matrix): adds matrix to the current Matrix instance and returns the result as a new Matrix

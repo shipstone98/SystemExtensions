@@ -4,16 +4,33 @@ using System.Collections.Generic;
 
 namespace Shipstone.System.Collections
 {
+    /// <summary>
+    /// Represents a tree with zero or more branches.
+    /// </summary>
+    /// <typeparam name="T">Specifies the item type of the tree.</typeparam>
     public partial class Tree<T> : ICollection<T>, ICollection<Tree<T>.Node>
     {
         private Tree<T>.Node _Root;
 
-        public int Count => throw new NotImplementedException();
+        /// <summary>
+        /// Gets the number of branches in the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <value>The number of branches in the <see cref="Tree{T}" />. The value is recursive.</value>
+        public int Count => this._Root is null ? 0 : this._Root._Count;
         bool ICollection<T>.IsReadOnly => false;
         bool ICollection<Tree<T>.Node>.IsReadOnly => false;
+
+        /// <summary>
+        /// Gets the root <see cref="Tree{T}.Node" /> of the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <value>The root <see cref="Tree{T}.Node" /> of the <see cref="Tree{T}" />, or <c>null</c> if the tree is empty.</value>
         public Tree<T>.Node Root => this._Root;
 
-        public Tree() => throw new NotImplementedException();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Tree{T}" /> class that is empty.
+        /// </summary>
+        public Tree() { }
+
         public Tree(Tree<T> tree) : this(tree, false) { }
         public Tree(Tree<T> tree, bool recursive) => throw new NotImplementedException();
         public Tree(Tree<T>.Node node) : this(node, false) { }
