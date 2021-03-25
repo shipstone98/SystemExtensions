@@ -449,7 +449,7 @@ namespace Shipstone.System.Numerics
         /// </summary>
         /// <param name="matrix">The <see cref="Matrix" /> to be multiplied.</param>
         /// <param name="scalar">The <see cref="Double" /> to multiply <c><paramref name="matrix" /></c> by.</param>
-        /// <returns>The result of <c><paramref name="matrix" /></c> multiplied by <c><paramref name="scalar" /></c>.</returns>
+        /// <returns>The result of all entries in <c><paramref name="matrix" /></c> multiplied by <c><paramref name="scalar" /></c>.</returns>
         /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
         public static Matrix operator *(Matrix matrix, double scalar) => matrix is null ? throw new ArgumentNullException(nameof (matrix)) : matrix.Multiply(scalar);
 
@@ -459,7 +459,7 @@ namespace Shipstone.System.Numerics
         /// </summary>
         /// <param name="a">The <see cref="Matrix" /> to be multiplied.</param>
         /// <param name="b">The <see cref="Matrix" /> to multiply <c><paramref name="a" /></c> by.</param>
-        /// <returns>The result of <c><paramref name="a" /></c> multiplied to <c><paramref name="b" /></c>.</returns>
+        /// <returns>The result of <c><paramref name="a" /></c> multiplied by <c><paramref name="b" /></c>.</returns>
         /// <exception cref="ArgumentException">The number of columns contained in <c><paramref name="a" /></c> is not equal to the number of rows contained in <c><paramref name="b" /></c>.</exception>
         /// <exception cref="ArgumentNullException"><c><paramref name="a" /></c> is <c>null</c> -or- <c><paramref name="b" /></c> is <c>null</c>.</exception>
         public static Matrix operator *(Matrix a, Matrix b)
@@ -491,5 +491,13 @@ namespace Shipstone.System.Numerics
         /// <exception cref="ArgumentException">The number of rows contained in the two matrices are not equal -or- the number of columns contained in the two matrices are not equal.</exception>
         /// <exception cref="ArgumentNullException"><c><paramref name="a" /></c> is <c>null</c> -or- <c><paramref name="b" /></c> is <c>null</c>.</exception>
         public static Matrix operator -(Matrix a, Matrix b) => Matrix._Add(a, b, true);
+
+        /// <summary>
+        /// Negates the specified <see cref="Matrix" /> by multiplying all its values by -1.
+        /// </summary>
+        /// <param name="matrix">The <see cref="Matrix" /> to be negated.</param>
+        /// <returns>The result of entries in <c><paramref name="matrix" /></c> multiplied by -1.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
+        public static Matrix operator -(Matrix matrix) => matrix * -1;
     }
 }

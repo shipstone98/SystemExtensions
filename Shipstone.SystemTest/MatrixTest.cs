@@ -623,6 +623,53 @@ namespace Shipstone.SystemTest
             Assert.ThrowsException<ArgumentNullException>(() => this._Matrix - null);
             Assert.ThrowsException<ArgumentNullException>(() => null - this._Matrix);
         }
+
+        [TestMethod]
+        public void TestUnaryNegation_Empty()
+        {
+            Matrix result = - this._Matrix;
+            Assert.AreEqual(result, this._Matrix * -1);
+
+            for (int i = 0; i < result.Rows; i ++)
+            {
+                for (int j = 0; j < result.Columns; j ++)
+                {
+                    Assert.AreEqual(0, result[i, j]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestUnaryNegation_NotEmpty()
+        {
+            double[,] answers = new double[this._Matrix.Rows, this._Matrix.Columns];
+
+            for (int i = 0; i < this._Matrix.Rows; i ++)
+            {
+                for (int j = 0; j < this._Matrix.Columns; j ++)
+                {
+                    double n = MatrixTest._Random.NextDouble();
+                    this._Matrix[i, j] = answers[i, j] = n;
+                }
+            }
+
+            Matrix result = - this._Matrix;
+            Assert.AreEqual(result.Rows, this._Matrix.Rows);
+            Assert.AreEqual(result.Columns, this._Matrix.Columns);
+
+            for (int i = 0; i < result.Rows; i ++)
+            {
+                for (int j = 0; j < result.Columns; j ++)
+                {
+                    Assert.AreEqual(answers[i, j] * -1, result[i, j]);
+                }
+            }
+
+            Assert.AreEqual(result, this._Matrix * -1);
+        }
+
+        [TestMethod]
+        public void TestUnaryNegation_Null() => Assert.ThrowsException<ArgumentNullException>(() => - (null as Matrix));
 #endregion
     }
 }

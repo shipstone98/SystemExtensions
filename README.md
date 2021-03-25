@@ -107,3 +107,4 @@ Extension classes to .NET Standard 2.0.
 - public static Matrix operator *(Matrix matrix, double scalar): multiplies a Matrix by a scalar value and returns the result as a new Matrix
 - public static Matrix operator *(Matrix a, Matrix b): multiplies one Matrix by another and returns the result as a new Matrix
 - public static Matrix operator -(Matrix a, Matrix b): subtracts one Matrix from another and returns the result as a new Matrix
+- public static Matrix operator -(Matrix matrix): negates the specified Matrix by multiplying all its values by -1
