@@ -101,5 +101,9 @@ Extension classes to .NET Standard 2.0.
 - public Matrix Subtract(Matrix matrix): subtracts matrix from the current Matrix instance and returns the result as a new Matrix
 
 #### Operators
+- public static Matrix operator +(Matrix a, Matrix b): adds one Matrix to another and returns the result as a new Matrix
 - public static bool operator ==(Matrix a, Matrix b): determines whether two matrices are equal
 - public static bool operator !=(Matrix a, Matrix b): determines whether two matrices are unequal
+- public static Matrix operator *(Matrix matrix, double scalar): multiplies a Matrix by a scalar value and returns the result as a new Matrix
+- public static Matrix operator *(Matrix a, Matrix b): multiplies one Matrix by another and returns the result as a new Matrix
+- public static Matrix operator -(Matrix a, Matrix b): subtracts one Matrix from another and returns the result as a new Matrix

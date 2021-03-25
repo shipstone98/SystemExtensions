@@ -197,6 +197,9 @@ namespace Shipstone.SystemTest
                     Assert.AreEqual(0.0, result[i, j]);
                 }
             }
+
+            Assert.AreEqual(this._Matrix + matrix, result);
+            Assert.AreEqual(matrix + this._Matrix, result);
         }
 
         [TestMethod]
@@ -227,21 +230,42 @@ namespace Shipstone.SystemTest
                     Assert.AreEqual(answers[i, j], result[i, j]);
                 }
             }
+
+            Assert.AreEqual(this._Matrix + matrix, result);
+            Assert.AreEqual(matrix + this._Matrix, result);
         }
 
         [TestMethod]
-        public void TestAdd_NotEqualSize()
+        public void TestAdd_NotEqualColumns()
+        {
+            Matrix matrix = new Matrix(this._Matrix.Rows, this._Matrix.Columns + 1);
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Add(matrix));
+            Assert.AreEqual("Matrix.Columns is not equal to the number of columns contained in matrix.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix + matrix);
+            Assert.AreEqual("The number of columns contained in the two matrices are not equal.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => matrix + this._Matrix);
+            Assert.AreEqual("The number of columns contained in the two matrices are not equal.", ex.Message);
+        }
+
+        [TestMethod]
+        public void TestAdd_NotEqualRows()
         {
             Matrix matrix = new Matrix(this._Matrix.Rows + 1, this._Matrix.Columns);
             Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Add(matrix));
-            Assert.AreEqual("Matrix.Rows is not equal to the number of rows in matrix.", ex.Message);
-            matrix = new Matrix(this._Matrix.Rows, this._Matrix.Columns + 1);
-            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Add(matrix));
-            Assert.AreEqual("Matrix.Columns is not equal to the number of columns in matrix.", ex.Message);
+            Assert.AreEqual("Matrix.Rows is not equal to the number of rows contained in matrix.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix + matrix);
+            Assert.AreEqual("The number of rows contained in the two matrices are not equal.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => matrix + this._Matrix);
+            Assert.AreEqual("The number of rows contained in the two matrices are not equal.", ex.Message);
         }
 
         [TestMethod]
-        public void TestAdd_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Add(null));
+        public void TestAdd_Null()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Add(null));
+            Assert.ThrowsException<ArgumentNullException>(() => this._Matrix + null);
+            Assert.ThrowsException<ArgumentNullException>(() => null + this._Matrix);
+        }
 
         [TestMethod]
         public void TestAddDirect_NotNull()
@@ -396,12 +420,14 @@ namespace Shipstone.SystemTest
             Matrix result = this._Matrix.Multiply(SCALAR);
             Assert.AreEqual(result.Rows, this._Matrix.Rows);
             Assert.AreEqual(result.Columns, this._Matrix.Columns);
+            Matrix operatorResult = this._Matrix * SCALAR;
 
             for (int i = 0; i < result.Rows; i ++)
             {
                 for (int j = 0; j < result.Columns; j ++)
                 {
                     Assert.AreEqual(0, MathExtensionsTest._CompareDouble(answers[i, j], result[i, j]));
+                    Assert.AreEqual(0, MathExtensionsTest._CompareDouble(operatorResult[i, j], result[i, j]));
                 }
             }
         }
@@ -428,12 +454,15 @@ namespace Shipstone.SystemTest
             resultArray[2] = new double[SIZE] { 50, 70, 90, 110, 130 };
             resultArray[3] = new double[SIZE] { 60, 85, 110, 135, 160 };
             resultArray[4] = new double[SIZE] { 70, 100, 130, 160, 190 };
+            Matrix operatorResult1 = matrix1 * matrix2, operatorResult2 = matrix2 * matrix1;
 
             for (int i = 0; i < result.Rows; i ++)
             {
                 for (int j = 0; j < result.Columns; j ++)
                 {
                     Assert.AreEqual(0, MathExtensionsTest._CompareDouble(resultArray[i][j], result[i, j]));
+                    Assert.AreEqual(0, MathExtensionsTest._CompareDouble(operatorResult1[i, j], result[i, j]));
+                    Assert.AreEqual(0, MathExtensionsTest._CompareDouble(operatorResult2[i, j], result[i, j]));
                 }
             }
         }
@@ -443,14 +472,29 @@ namespace Shipstone.SystemTest
         {
             Matrix matrix = new(MatrixTest._Rows + MatrixTest._Columns, MatrixTest._Columns + MatrixTest._Rows + 1);
             Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Multiply(matrix));
-            Assert.AreEqual("Matrix.Columns is not equal to the number of rows in matrix.", ex.Message);
+            Assert.AreEqual("Matrix.Columns is not equal to the number of rows contained in matrix.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix * matrix);
+            Assert.AreEqual("The number of columns contained in a is not equal to the number of rows contained in b.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => matrix * this._Matrix);
+            Assert.AreEqual("The number of columns contained in a is not equal to the number of rows contained in b.", ex.Message);
             matrix = new(this._Matrix);
             ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Multiply(matrix));
-            Assert.AreEqual("Matrix.Columns is not equal to the number of rows in matrix.", ex.Message);
+            Assert.AreEqual("Matrix.Columns is not equal to the number of rows contained in matrix.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix * matrix);
+            Assert.AreEqual("The number of columns contained in a is not equal to the number of rows contained in b.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => matrix * this._Matrix);
+            Assert.AreEqual("The number of columns contained in a is not equal to the number of rows contained in b.", ex.Message);
         }
 
         [TestMethod]
-        public void TestMultiply_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Multiply(null));
+        public void TestMultiply_Null()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Multiply(null));
+            Assert.ThrowsException<ArgumentNullException>(() => this._Matrix * null);
+            Assert.ThrowsException<ArgumentNullException>(() => null * this._Matrix);
+            this._Matrix = null;
+            Assert.ThrowsException<ArgumentNullException>(() => this._Matrix * 4.7);
+        }
 
         [TestMethod]
         public void TestMultiply_ValidSize()
@@ -483,12 +527,14 @@ namespace Shipstone.SystemTest
             resultArray[5] = new double[MatrixTest._Rows + 1] { 196, 252, 308, 364, 420, 476, 532, 588, 644 };
             resultArray[6] = new double[MatrixTest._Rows + 1] { 217, 280, 343, 406, 469, 532, 595, 658, 721 };
             resultArray[7] = new double[MatrixTest._Rows + 1] { 238, 308, 378, 448, 518, 588, 658, 728, 798 };
+            Matrix operatorResult = this._Matrix * matrix;
 
             for (int i = 0; i < result.Rows; i ++)
             {
                 for (int j = 0; j < result.Columns; j ++)
                 {
                     Assert.AreEqual(0, MathExtensionsTest._CompareDouble(resultArray[i][j], result[i, j]));
+                    Assert.AreEqual(0, MathExtensionsTest._CompareDouble(operatorResult[i, j], result[i, j]));
                 }
             }
         }
@@ -510,6 +556,8 @@ namespace Shipstone.SystemTest
                     Assert.AreEqual(0.0, result[i, j]);
                 }
             }
+
+            Assert.AreEqual(result, this._Matrix - matrix);
         }
 
         [TestMethod]
@@ -540,6 +588,20 @@ namespace Shipstone.SystemTest
                     Assert.AreEqual(answers[i, j], result[i, j]);
                 }
             }
+
+            Assert.AreEqual(result, this._Matrix - matrix);
+        }
+
+        [TestMethod]
+        public void TestSubtract_NotEqualColumns()
+        {
+            Matrix matrix = new Matrix(this._Matrix.Rows, this._Matrix.Columns + 1);
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Subtract(matrix));
+            Assert.AreEqual("Matrix.Columns is not equal to the number of columns contained in matrix.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix - matrix);
+            Assert.AreEqual("The number of columns contained in the two matrices are not equal.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => matrix - this._Matrix);
+            Assert.AreEqual("The number of columns contained in the two matrices are not equal.", ex.Message);
         }
 
         [TestMethod]
@@ -547,14 +609,20 @@ namespace Shipstone.SystemTest
         {
             Matrix matrix = new Matrix(this._Matrix.Rows + 1, this._Matrix.Columns);
             Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Subtract(matrix));
-            Assert.AreEqual("Matrix.Rows is not equal to the number of rows in matrix.", ex.Message);
-            matrix = new Matrix(this._Matrix.Rows, this._Matrix.Columns + 1);
-            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix.Subtract(matrix));
-            Assert.AreEqual("Matrix.Columns is not equal to the number of columns in matrix.", ex.Message);
+            Assert.AreEqual("Matrix.Rows is not equal to the number of rows contained in matrix.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => this._Matrix - matrix);
+            Assert.AreEqual("The number of rows contained in the two matrices are not equal.", ex.Message);
+            ex = Assert.ThrowsException<ArgumentException>(() => matrix - this._Matrix);
+            Assert.AreEqual("The number of rows contained in the two matrices are not equal.", ex.Message);
         }
 
         [TestMethod]
-        public void TestSubtract_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Subtract(null));
+        public void TestSubtract_Null()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => this._Matrix.Subtract(null));
+            Assert.ThrowsException<ArgumentNullException>(() => this._Matrix - null);
+            Assert.ThrowsException<ArgumentNullException>(() => null - this._Matrix);
+        }
 #endregion
     }
 }

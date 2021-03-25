@@ -12,9 +12,9 @@ namespace Shipstone.System.Numerics
         private readonly int _Rows;
 
         /// <summary>
-        /// Gets the number of columns in the <see cref="Matrix" />.
+        /// Gets the number of columns contained in the <see cref="Matrix" />.
         /// </summary>
-        /// <value>The number of columns in the <see cref="Matrix" />.</value>
+        /// <value>The number of columns contained in the <see cref="Matrix" />.</value>
         public int Columns => this._Columns;
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace Shipstone.System.Numerics
         }
 
         /// <summary>
-        /// Gets the number of rows in the <see cref="Matrix" />.
+        /// Gets the number of rows contained in the <see cref="Matrix" />.
         /// </summary>
-        /// <value>The number of rows in the <see cref="Matrix" />.</value>
+        /// <value>The number of rows contained in the <see cref="Matrix" />.</value>
         public int Rows => this._Rows;
 
         /// <summary>
@@ -108,8 +108,8 @@ namespace Shipstone.System.Numerics
         /// <summary>
         /// Initializes a new instance of the <see cref="Matrix" /> class that is empty and contains the specified number of rows and columns.
         /// </summary>
-        /// <param name="rows">The number of rows in the <see cref="Matrix" />.</param>
-        /// <param name="columns">The number of columns in the <see cref="Matrix" />.</param>
+        /// <param name="rows">The number of rows contained in the <see cref="Matrix" />.</param>
+        /// <param name="columns">The number of columns contained in the <see cref="Matrix" />.</param>
         /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="rows" /></c> is less than or equal to 0 -or- <c><paramref name="columns" /></c> is less than or equal to 0.</exception>
         public Matrix(int rows, int columns) : this(rows, columns, true) { }
 
@@ -140,12 +140,12 @@ namespace Shipstone.System.Numerics
 
             if (this._Rows != matrix._Rows)
             {
-                throw new ArgumentException($"Matrix.Rows is not equal to the number of rows in {nameof (matrix)}.");
+                throw new ArgumentException($"Matrix.Rows is not equal to the number of rows contained in {nameof (matrix)}.");
             }
 
             if (this._Columns != matrix._Columns)
             {
-                throw new ArgumentException($"Matrix.Columns is not equal to the number of columns in {nameof (matrix)}.");
+                throw new ArgumentException($"Matrix.Columns is not equal to the number of columns contained in {nameof (matrix)}.");
             }
 
             Matrix result = new Matrix(this._Rows, this._Columns);
@@ -201,12 +201,30 @@ namespace Shipstone.System.Numerics
             }
         }
 
+        private Matrix _Multiply(Matrix matrix)
+        {
+            Matrix result = new Matrix(this._Rows, matrix._Columns);
+
+            for (int i = 0; i < result._Rows; i ++)
+            {
+                for (int j = 0; j < result._Columns; j ++)
+                {
+                    for (int k = 0; k < this._Columns; k ++)
+                    {
+                        result._Array[i, j] += this._Array[i, k] * matrix._Array[k, j];
+                    }
+                }
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Adds <c><paramref name="matrix" /></c> to the current <see cref="Matrix" /> instance and returns the result as a new <see cref="Matrix" />.
         /// </summary>
         /// <param name="matrix">The <see cref="Matrix" /> to add to the current instance.</param>
         /// <returns>The result of <c><paramref name="matrix" /></c> added to the current <see cref="Matrix" /> instance.</returns>
-        /// <exception cref="ArgumentException"><see cref="Matrix.Rows" /> is not equal to the number of rows in <c><paramref name="matrix" /></c> -or- <see cref="Matrix.Columns" /> is not equal to the number of columns in <c><paramref name="matrix" /></c>.</exception>
+        /// <exception cref="ArgumentException"><see cref="Matrix.Rows" /> is not equal to the number of rows contained in <c><paramref name="matrix" /></c> -or- <see cref="Matrix.Columns" /> is not equal to the number of columns contained in <c><paramref name="matrix" /></c>.</exception>
         /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
         public Matrix Add(Matrix matrix) => this._Add(matrix, false);
 
@@ -323,7 +341,7 @@ namespace Shipstone.System.Numerics
         /// </summary>
         /// <param name="matrix">The <see cref="Matrix" /> to multiply the current instance by.</param>
         /// <returns>The result of the current <see cref="Matrix" /> instance multiplied by <c><paramref name="matrix" /></c>.</returns>
-        /// <exception cref="ArgumentException"><see cref="Matrix.Columns" /> is not equal to the number of rows in <c><paramref name="matrix" /></c>.</exception>
+        /// <exception cref="ArgumentException"><see cref="Matrix.Columns" /> is not equal to the number of rows contained in <c><paramref name="matrix" /></c>.</exception>
         /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
         public Matrix Multiply(Matrix matrix)
         {
@@ -334,23 +352,10 @@ namespace Shipstone.System.Numerics
 
             if (this._Columns != matrix._Rows)
             {
-                throw new ArgumentException($"Matrix.Columns is not equal to the number of rows in {nameof (matrix)}.");
+                throw new ArgumentException($"Matrix.Columns is not equal to the number of rows contained in {nameof (matrix)}.");
             }
 
-            Matrix result = new Matrix(this._Rows, matrix._Columns);
-
-            for (int i = 0; i < result._Rows; i ++)
-            {
-                for (int j = 0; j < result._Columns; j ++)
-                {
-                    for (int k = 0; k < this._Columns; k ++)
-                    {
-                        result._Array[i, j] += this._Array[i, k] * matrix._Array[k, j];
-                    }
-                }
-            }
-
-            return result;
+            return this._Multiply(matrix);
         }
 
         /// <summary>
@@ -358,17 +363,42 @@ namespace Shipstone.System.Numerics
         /// </summary>
         /// <param name="matrix">The <see cref="Matrix" /> to subtract from the current instance.</param>
         /// <returns>The result of <c><paramref name="matrix" /></c> subtracted from the current <see cref="Matrix" /> instance.</returns>
-        /// <exception cref="ArgumentException"><see cref="Matrix.Rows" /> is not equal to the number of rows in <c><paramref name="matrix" /></c> -or- <see cref="Matrix.Columns" /> is not equal to the number of columns in <c><paramref name="matrix" /></c>.</exception>
+        /// <exception cref="ArgumentException"><see cref="Matrix.Rows" /> is not equal to the number of rows contained in <c><paramref name="matrix" /></c> -or- <see cref="Matrix.Columns" /> is not equal to the number of columns contained in <c><paramref name="matrix" /></c>.</exception>
         /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
         public Matrix Subtract(Matrix matrix) => this._Add(matrix, true);
 
         public override String ToString() => this.ToString(false);
         public String ToString(bool includeBorders) => throw new NotImplementedException();
 
+        private static Matrix _Add(Matrix a, Matrix b, bool subtract)
+        {
+            if (a is null)
+            {
+                throw new ArgumentNullException(nameof (a));
+            }
+
+            if (b is null)
+            {
+                throw new ArgumentNullException(nameof (b));
+            }
+
+            if (a._Rows != b._Rows)
+            {
+                throw new ArgumentException("The number of rows contained in the two matrices are not equal.");
+            }
+
+            if (a._Columns != b._Columns)
+            {
+                throw new ArgumentException("The number of columns contained in the two matrices are not equal.");
+            }
+
+            return a._Add(b, subtract);
+        }
+
         /// <summary>
         /// Creates an identity matrix of the specified size.
         /// </summary>
-        /// <param name="size">The number of rows and columns in the <see cref="Matrix" />.</param>
+        /// <param name="size">The number of rows and columns contained in the <see cref="Matrix" />.</param>
         /// <returns>A new <see cref="Matrix" /> that is the identity matrix for its <c><paramref name="size" /></c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="size" /></c> is less than or equal to 0.</exception>
         public static Matrix CreateIndentity(int size)
@@ -389,6 +419,16 @@ namespace Shipstone.System.Numerics
         }
 
         /// <summary>
+        /// Adds one <see cref="Matrix" /> to another and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="a">The <see cref="Matrix" /> to be added.</param>
+        /// <param name="b">The <see cref="Matrix" /> to add to <c><paramref name="a" /></c>.</param>
+        /// <returns>The result of <c><paramref name="a" /></c> added to <c><paramref name="b" /></c>.</returns>
+        /// <exception cref="ArgumentException">The number of rows contained in the two matrices are not equal -or- the number of columns contained in the two matrices are not equal.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="a" /></c> is <c>null</c> -or- <c><paramref name="b" /></c> is <c>null</c>.</exception>
+        public static Matrix operator +(Matrix a, Matrix b) => Matrix._Add(a, b, false);
+
+        /// <summary>
         /// Determines whether two matrices are equal.
         /// </summary>
         /// <param name="a">The first <see cref="Matrix" /> to compare, or <c>null</c>.</param>
@@ -403,5 +443,53 @@ namespace Shipstone.System.Numerics
         /// <param name="b">The second <see cref="Matrix" /> to compare, or <c>null</c>.</param>
         /// <returns><c>true</c> if <c><paramref name="a" /></c> and <c><paramref name="b" /></c> contain a different number of rows or columns or values in any entry; otherwise, <c>false</c>.</returns>
         public static bool operator !=(Matrix a, Matrix b) => !(a == b);
+
+        /// <summary>
+        /// Multiplies a <see cref="Matrix" /> by a scalar value and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="matrix">The <see cref="Matrix" /> to be multiplied.</param>
+        /// <param name="scalar">The <see cref="Double" /> to multiply <c><paramref name="matrix" /></c> by.</param>
+        /// <returns>The result of <c><paramref name="matrix" /></c> multiplied by <c><paramref name="scalar" /></c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
+        public static Matrix operator *(Matrix matrix, double scalar) => matrix is null ? throw new ArgumentNullException(nameof (matrix)) : matrix.Multiply(scalar);
+
+
+        /// <summary>
+        /// Multiplies one <see cref="Matrix" /> by another and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="a">The <see cref="Matrix" /> to be multiplied.</param>
+        /// <param name="b">The <see cref="Matrix" /> to multiply <c><paramref name="a" /></c> by.</param>
+        /// <returns>The result of <c><paramref name="a" /></c> multiplied to <c><paramref name="b" /></c>.</returns>
+        /// <exception cref="ArgumentException">The number of columns contained in <c><paramref name="a" /></c> is not equal to the number of rows contained in <c><paramref name="b" /></c>.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="a" /></c> is <c>null</c> -or- <c><paramref name="b" /></c> is <c>null</c>.</exception>
+        public static Matrix operator *(Matrix a, Matrix b)
+        {
+            if (a is null)
+            {
+                throw new ArgumentNullException(nameof (a));
+            }
+
+            if (b is null)
+            {
+                throw new ArgumentNullException(nameof (b));
+            }
+
+            if (a._Columns != b._Rows)
+            {
+                throw new ArgumentException($"The number of columns contained in {nameof (a)} is not equal to the number of rows contained in {nameof (b)}.");
+            }
+
+            return a._Multiply(b);
+        }
+
+        /// <summary>
+        /// Subtracts one <see cref="Matrix" /> from another and returns the result as a new <see cref="Matrix" />.
+        /// </summary>
+        /// <param name="a">The <see cref="Matrix" /> to be subtracted.</param>
+        /// <param name="b">The <see cref="Matrix" /> to subtract from <c><paramref name="a" /></c>.</param>
+        /// <returns>The result of <c><paramref name="b" /></c> subtracted from <c><paramref name="a" /></c>.</returns>
+        /// <exception cref="ArgumentException">The number of rows contained in the two matrices are not equal -or- the number of columns contained in the two matrices are not equal.</exception>
+        /// <exception cref="ArgumentNullException"><c><paramref name="a" /></c> is <c>null</c> -or- <c><paramref name="b" /></c> is <c>null</c>.</exception>
+        public static Matrix operator -(Matrix a, Matrix b) => Matrix._Add(a, b, true);
     }
 }
