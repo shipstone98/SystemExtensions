@@ -763,12 +763,84 @@ namespace Shipstone.SystemTest
         [TestMethod]
         public void TestGetEnumerator_Modified()
         {
-            using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+
+            ICollection<Action> nonConstMethods = new List<Action>()
             {
-                enumerator.Dispose();
-                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.MoveNext());
-                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.Reset());
-                int current = enumerator.Current;
+                () => this._Table[VALUE] = VALUE,
+                () => this._Table.Add(VALUE),
+                () => this._Table.Add(VALUE, VALUE),
+                () => this._Table.AddRange(new int[] { VALUE, VALUE }),
+                () => this._Table.Clear(),
+                () => this._Table.Remove(VALUE),
+                () => this._Table.Remove(VALUE, VALUE),
+                () => this._Table.RemoveAll(VALUE),
+                () => this._Table.RemoveAllRange(VALUE),
+                () => this._Table.RemoveAllRange(VALUE, VALUE_2),
+                () => this._Table.RemoveRange(new int[] { VALUE, VALUE }),
+                () => this._Table.Swap(VALUE, VALUE_2)
+            };
+
+            const String MESSAGE = "The collection was modified after the enumerator was created.";
+            
+            foreach (Action nonConstMethod in nonConstMethods)
+            {
+                this._Table[VALUE] = VALUE;
+                this._Table[VALUE_2] = VALUE_2;
+
+                using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
+                {
+                    nonConstMethod();
+                    Exception ex = Assert.ThrowsException<InvalidOperationException>(() => enumerator.MoveNext());
+                    Assert.AreEqual(MESSAGE, ex.Message);
+                    ex = Assert.ThrowsException<InvalidOperationException>(() => enumerator.Reset());
+                    Assert.AreEqual(MESSAGE, ex.Message);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestGetEnumerator_NotModified()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            Object temp;
+            int[] array = new int[10 + VALUE_2 + VALUE];
+
+            ICollection<Action> constMethods = new List<Action>()
+            {
+                () => temp = this._Table.Count,
+                () => temp = this._Table.Frequencies,
+                () => temp = this._Table.Items,
+                () => temp = this._Table.MaxFrequency,
+                () => temp = this._Table.MinFrequency,
+                () => temp = this._Table[VALUE],
+                () => this._Table.Contains(VALUE),
+                () => this._Table.ContainsAll(new int[] { VALUE, VALUE_2 }),
+                () => this._Table.CopyTo(array),
+                () => this._Table.CopyTo(array, 1),
+                () => this._Table.CopyTo(array, 1, VALUE),
+                () => this._Table.CopyTo(array, 1, VALUE, VALUE_2),
+                () => this._Table.GetEnumerator(),
+                () => this._Table.GetMax(),
+                () => this._Table.GetMin(),
+                () => this._Table.GetRange(VALUE),
+                () => this._Table.GetRange(VALUE, VALUE_2),
+                () => this._Table.ToArray(),
+                () => this._Table.ToArray(VALUE),
+                () => this._Table.ToArray(VALUE, VALUE_2)
+            };
+            
+            foreach (Action constMethod in constMethods)
+            {
+                this._Table[VALUE] = VALUE;
+                this._Table[VALUE_2] = VALUE_2;
+
+                using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
+                {
+                    constMethod();
+                    enumerator.MoveNext();
+                    enumerator.Reset();
+                }
             }
         }
 
@@ -907,6 +979,115 @@ namespace Shipstone.SystemTest
             this._AssertProperties(sample.Length, dictionary.Count, min, max);
         }
 #endregion
+
+#region GetRange methods
+        [TestMethod]
+        public void TestGetRange_Int32_Empty()
+        {
+            Exception ex = Assert.ThrowsException<InvalidOperationException>(() => this._Table.GetRange(10));
+            Assert.AreEqual("The FrequencyTable<T> is empty.", ex.Message);
+        }
+        
+        [TestMethod]
+        public void TestGetRange_Int32_NotEmpty_Contains()
+        {
+            const int VALUE = 10, VALUE_2 = 20;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            IEnumerable<int> range = this._Table.GetRange(VALUE);
+            Assert.IsNotNull(range);
+            Assert.AreEqual(1, range.Count());
+            Assert.AreEqual(VALUE, range.First());
+        }
+        
+        [TestMethod]
+        public void TestGetRange_Int32_NotEmpty_NotContains()
+        {
+            const int VALUE = 10, VALUE_2 = 20;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            IEnumerable<int> range = this._Table.GetRange(VALUE);
+            Assert.IsNotNull(range);
+            Assert.AreEqual(1, range.Count());
+            Assert.AreEqual(VALUE, range.First());
+        }
+
+        [TestMethod]
+        public void TestGetRange_Int32_OutOfRange()
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(-1));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(0));
+        }
+        [TestMethod]
+        public void TestGetRange_Int32_Int32_Empty()
+        {
+            Exception ex = Assert.ThrowsException<InvalidOperationException>(() => this._Table.GetRange(10, 20));
+            Assert.AreEqual("The FrequencyTable<T> is empty.", ex.Message);
+        }
+        
+        [TestMethod]
+        public void TestGetRange_Int32_Int32_NotEmpty_Contains()
+        {
+            const int VALUE = 10, VALUE_2 = 20;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            IEnumerable<int> range = this._Table.GetRange(VALUE, VALUE_2);
+            Assert.IsNotNull(range);
+            ICollection<int> remaining = new LinkedList<int>();
+            remaining.Add(VALUE);
+            remaining.Add(VALUE_2);
+
+            using (IEnumerator<int> enumerator = range.GetEnumerator())
+            {
+                Assert.IsTrue(enumerator.MoveNext());
+                Assert.IsTrue(remaining.Remove(enumerator.Current));
+                Assert.IsTrue(enumerator.MoveNext());
+                Assert.IsTrue(remaining.Remove(enumerator.Current));
+                Assert.IsFalse(enumerator.MoveNext());
+            }
+
+            Assert.AreEqual(0, remaining.Count);
+        }
+        
+        [TestMethod]
+        public void TestGetRange_Int32_Int32_NotEmpty_NotContains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2, VALUE_3 = VALUE * 3;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            this._Table[VALUE_3] = VALUE_3;
+            IEnumerable<int> range = this._Table.GetRange(VALUE, VALUE_3 - 1);
+            Assert.IsNotNull(range);
+            ICollection<int> remaining = new LinkedList<int>();
+            remaining.Add(VALUE);
+            remaining.Add(VALUE_2);
+
+            using (IEnumerator<int> enumerator = range.GetEnumerator())
+            {
+                Assert.IsTrue(enumerator.MoveNext());
+                Assert.IsTrue(remaining.Remove(enumerator.Current));
+                Assert.IsTrue(enumerator.MoveNext());
+                Assert.IsTrue(remaining.Remove(enumerator.Current));
+                Assert.IsFalse(enumerator.MoveNext());
+            }
+
+            Assert.AreEqual(0, remaining.Count);
+        }
+
+        [TestMethod]
+        public void TestGetRange_Int32_Int32_OutOfRange()
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(-1, 10));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(0, 10));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(10, Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(10, -1));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.GetRange(10, 0));
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Table.GetRange(20, 10));
+            Assert.AreEqual("maxFrequency is less than minFrequency.", ex.Message);
+        }
+#endregion
 #endregion
 
 #region Remove functionality
@@ -1003,6 +1184,135 @@ namespace Shipstone.SystemTest
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.Remove(CONTROL, -1));
             this._AssertProperties(0, 0, 0, 0);
         }
+#endregion
+
+#region RemoveAll functionality
+        [TestMethod]
+        public void TestRemoveAll_Empty() => Assert.AreEqual(0, this._Table.RemoveAll(10));
+
+        [TestMethod]
+        public void TestRemoveAll_NotEmpty_Contains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(VALUE, this._Table.RemoveAll(VALUE));
+            Assert.AreEqual(0, this._Table[VALUE]);
+            Assert.AreEqual(VALUE_2, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveAll_NotEmpty_NotContains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(0, this._Table.RemoveAll(VALUE));
+            Assert.AreEqual(VALUE_2, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_Empty() => Assert.AreEqual(0, this._Table.RemoveAllRange(10));
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_NotEmpty_Contains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(VALUE, this._Table.RemoveAllRange(VALUE));
+            Assert.AreEqual(0, this._Table[VALUE]);
+            Assert.AreEqual(VALUE_2, this._Table.Count);
+            Assert.AreEqual(VALUE_2, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_NotEmpty_NotContains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(0, this._Table.RemoveAllRange(VALUE));
+            Assert.AreEqual(VALUE_2, this._Table.Count);
+            Assert.AreEqual(VALUE_2, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_OutOfRange()
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(-1));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(0));
+        }
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_Int32_Empty() => Assert.AreEqual(0, this._Table.RemoveAllRange(10, 20));
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_Int32_NotEmpty_Contains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(VALUE + VALUE_2, this._Table.RemoveAllRange(VALUE, VALUE_2));
+            Assert.AreEqual(0, this._Table.Count);
+            Assert.AreEqual(0, this._Table[VALUE]);
+            Assert.AreEqual(0, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_Int32_NotEmpty_NotContains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(0, this._Table.RemoveAllRange(VALUE));
+            Assert.AreEqual(VALUE_2, this._Table.Count);
+            Assert.AreEqual(VALUE_2, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveAllRange_Int32_Int32_OutOfRange()
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(Int32.MinValue, 10));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(-1, 10));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(0, 10));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(10, Int32.MinValue));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(10, -1));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => this._Table.RemoveAllRange(10, 0));
+            Exception ex = Assert.ThrowsException<ArgumentException>(() => this._Table.RemoveAllRange(20, 10));
+            Assert.AreEqual("maxFrequency is less than minFrequency.", ex.Message);
+        }
+        
+        [TestMethod]
+        public void TestRemoveRange_EmptyCollection() => Assert.AreEqual(0, this._Table.RemoveRange(Array.Empty<int>()));
+
+        [TestMethod]
+        public void TestRemoveRange_EmptyTable() => Assert.AreEqual(0, this._Table.RemoveRange(new int[] { 10 }));
+
+        [TestMethod]
+        public void TestRemoveRange_NotEmpty_Contains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(1, this._Table.RemoveRange(new int[] { VALUE }));
+            Assert.AreEqual(VALUE + VALUE_2 - 1, this._Table.Count);
+            Assert.AreEqual(VALUE - 1, this._Table[VALUE]);
+            Assert.AreEqual(VALUE_2, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveRange_NotEmpty_NotContains()
+        {
+            const int VALUE = 10, VALUE_2 = VALUE * 2;
+            this._Table[VALUE] = VALUE;
+            this._Table[VALUE_2] = VALUE_2;
+            Assert.AreEqual(2, this._Table.RemoveRange(new int[] { VALUE, VALUE_2 }));
+            Assert.AreEqual(VALUE + VALUE_2 - 2, this._Table.Count);
+            Assert.AreEqual(VALUE - 1, this._Table[VALUE]);
+            Assert.AreEqual(VALUE_2 - 1, this._Table[VALUE_2]);
+        }
+
+        [TestMethod]
+        public void TestRemoveRange_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.RemoveRange(null));
 #endregion
 #endregion
 

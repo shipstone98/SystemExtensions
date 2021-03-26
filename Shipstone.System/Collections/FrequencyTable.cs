@@ -8,7 +8,7 @@ namespace Shipstone.System.Collections
     /// Represents a strongly types frequency table of items.
     /// </summary>
     /// <typeparam name="T">The type of items in the list.</typeparam>
-    public partial class FrequencyTable<T> : ICollection, ICollection<T>, IReadOnlyCollection<T>
+    public partial class FrequencyTable<T> : ICollection<T>, IReadOnlyCollection<T>
     {
         private const String _ClassName = "FrequencyTable<T>";
 
@@ -33,7 +33,6 @@ namespace Shipstone.System.Collections
         public IEnumerable<int> Frequencies => this._Frequencies;
 
         bool ICollection<T>.IsReadOnly => false;
-        bool ICollection.IsSynchronized => false;
 
         /// <summary>
         /// Gets a collection containing all items contained in the <see cref="FrequencyTable{T}" />.
@@ -52,8 +51,6 @@ namespace Shipstone.System.Collections
         /// </summary>
         /// <value>The minimum of frequency of all items contained in the <see cref="FrequencyTable{T}" />, or 0 (zero) if the table is empty.</value>
         public int MinFrequency => this._MinFrequency;
-
-        Object ICollection.SyncRoot => this;
 
         /// <summary>
         /// Gets or sets the frequency of the specified item.
@@ -217,6 +214,25 @@ namespace Shipstone.System.Collections
             return sum;
         }
 
+        private IEnumerable<T> _GetRange(int minFrequency, int maxFrequency)
+        {
+            ICollection<T> range = new List<T>();
+
+            for (int i = 0; i < this._Items.Count; i ++)
+            {
+                int freq = this._Frequencies[i];
+
+                if (freq < minFrequency || freq > maxFrequency)
+                {
+                    continue;
+                }
+
+                range.Add(this._Items[i]);
+            }
+
+            return range;
+        }
+
         private void _NotifyEnumerators()
         {
             foreach (FrequencyTable<T>.Enumerator enumerator in this._Enumerators)
@@ -241,8 +257,8 @@ namespace Shipstone.System.Collections
 
             if (this._Frequencies[index] == frequency)
             {
-                this._Items.RemoveAt(index);
-                this._Frequencies.RemoveAt(index);
+                this._RemoveAll(index);
+                return true;
             }
             
             else
@@ -254,6 +270,41 @@ namespace Shipstone.System.Collections
             this._ResetMaxMin();
             this._NotifyEnumerators();
             return true;
+        }
+
+        private int _RemoveAll(int index)
+        {
+            int freq = this._Frequencies[index];
+            this._Items.RemoveAt(index);
+            this._Frequencies.RemoveAt(index);
+            this._Count -= freq;
+            this._ResetMaxMin();
+            this._NotifyEnumerators();
+            return freq;
+        }
+
+        private int _RemoveAllRange(int minFrequency, int maxFrequency)
+        {
+            int sum = 0;
+
+            for (int i = 0; i < this._Items.Count; i ++)
+            {
+                int freq = this._Frequencies[i];
+
+                if (freq < minFrequency || freq > maxFrequency)
+                {
+                    continue;
+                }
+
+                sum += freq;
+                this._Items.RemoveAt(i);
+                this._Frequencies.RemoveAt(i --);
+            }
+
+            this._Count -= sum;
+            this._ResetMaxMin();
+            this._NotifyEnumerators();
+            return sum;
         }
 
         private void _ResetMaxMin()
@@ -285,7 +336,7 @@ namespace Shipstone.System.Collections
 #region Public methods
 #region Add functionality
         /// <summary>
-        /// Adds an item to the <see cref="FrequencyTable{T}" />.
+        /// Increases the frequency of the specified item in the <see cref="FrequencyTable{T}" />.
         /// </summary>
         /// <param name="item">The item to be added to the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
         public void Add(T item) => this._Add(item, 1);
@@ -494,26 +545,6 @@ namespace Shipstone.System.Collections
 
             this._CopyTo(array, arrayIndex, minFrequency, maxFrequency);
         }
-
-        public void CopyTo(Array array) => throw new NotImplementedException();
-        public void CopyTo(Array array, int arrayIndex) => throw new NotImplementedException();
-        public void CopyTo(Array array, int arrayIndex, int frequency) =>  throw new NotImplementedException();
-        public void CopyTo(Array array, int arrayIndex, int minFrequency, int maxFrequency) => throw new NotImplementedException();
-#endregion
-
-#region Predicate functionality
-        public bool Exists(Predicate<T> match) => throw new NotImplementedException();
-        public bool Exists(Predicate<T> match, int frequency) => throw new NotImplementedException();
-        public bool Exists(Predicate<T> match, int minFrequency, int maxFrequency) => throw new NotImplementedException();
-        public T Find(Predicate<T> match) => throw new NotImplementedException();
-        public T Find(Predicate<T> match, int frequency) => throw new NotImplementedException();
-        public T Find(Predicate<T> match, int minFrequency, int maxFrequency) => throw new NotImplementedException();
-        public IEnumerable<T> FindAll(Predicate<T> match) => throw new NotImplementedException();
-        public IEnumerable<T> FindAll(Predicate<T> match, int frequency) => throw new NotImplementedException();
-        public IEnumerable<T> FindAll(Predicate<T> match, int minFrequency, int maxFrequency) => throw new NotImplementedException();
-        public void ForEach(Action<T> action) => throw new NotImplementedException();
-        public void ForEach(Action<T> action, int frequency) => throw new NotImplementedException();
-        public void ForEach(Action<T> action, int minFrequency, int maxFrequency) => throw new NotImplementedException();
 #endregion
 
         /// <summary>
@@ -530,60 +561,72 @@ namespace Shipstone.System.Collections
         /// </summary>
         /// <returns>A shallow copy of all items with the maximum frequency in the source <see cref="FrequencyTable{T}" />.</returns>
         /// <exception cref="InvalidOperationException">The <see cref="FrequencyTable{T}" /> is empty.</exception>
-        public IEnumerable<T> GetMax()
-        {
-            if (this._Count == 0)
-            {
-                throw new InvalidOperationException($"The {FrequencyTable<T>._ClassName} is empty.");
-            }
-
-            ICollection<T> max = new List<T>();
-            
-            for (int i = 0; i < this._Items.Count; i ++)
-            {
-                if (this._Frequencies[i] == this._MaxFrequency)
-                {
-                    max.Add(this._Items[i]);
-                }
-            }
-
-            return max;
-        }
+        public IEnumerable<T> GetMax() => this._Count == 0 ? throw new InvalidOperationException($"The {FrequencyTable<T>._ClassName} is empty.") : this._GetRange(this._MaxFrequency, this._MaxFrequency);
 
         /// <summary>
         /// Creates a shallow copy of all items with the minimum frequency in the source <see cref="FrequencyTable{T}" />.
         /// </summary>
         /// <returns>A shallow copy of all items with the minimum frequency in the source <see cref="FrequencyTable{T}" />.</returns>
         /// <exception cref="InvalidOperationException">The <see cref="FrequencyTable{T}" /> is empty.</exception>
-        public IEnumerable<T> GetMin()
+        public IEnumerable<T> GetMin() => this._Count == 0 ? throw new InvalidOperationException($"The {FrequencyTable<T>._ClassName} is empty.") : this._GetRange(this._MinFrequency, this._MinFrequency);
+
+        /// <summary>
+        /// Creates a shallow copy of all items with the specified frequency in the source <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="frequency">The frequency of items to copy.</param>
+        /// <returns>A shallow copy of all items with the specified frequency in the source <see cref="FrequencyTable{T}" />.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than or equal to 0.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="FrequencyTable{T}" /> is empty.</exception>
+        public IEnumerable<T> GetRange(int frequency)
         {
+            if (frequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (frequency));
+            }
+
+            return this._Count == 0 ? throw new InvalidOperationException($"The {FrequencyTable<T>._ClassName} is empty.") : this._GetRange(frequency, frequency);
+        }
+
+        /// <summary>
+        /// Creates a shallow copy of all items within the specified inclusive frequency range in the source <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="minFrequency">The minimum frequency of items to copy.</param>
+        /// <param name="maxFrequency">The maximum frequency of items to copy.</param>
+        /// <returns>A shallow copy of all items within the specified inclusive frequency range in the source <see cref="FrequencyTable{T}" />.</returns>
+        /// <exception cref="ArgumentException"><c><paramref name="maxFrequency" /></c> is less than <c><paramref name="minFrequency" /></c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="minFrequency" /></c> is less than or equal to 0 -or- <c><paramref name="maxFrequency" /></c> is less than or equal to 0.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="FrequencyTable{T}" /> is empty.</exception>
+        public IEnumerable<T> GetRange(int minFrequency, int maxFrequency)
+        {
+            if (minFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (minFrequency));
+            }
+
+            if (maxFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (maxFrequency));
+            }
+
+            if (maxFrequency < minFrequency)
+            {
+                throw new ArgumentException($"{nameof (maxFrequency)} is less than {nameof (minFrequency)}.");
+            }
+            
             if (this._Count == 0)
             {
                 throw new InvalidOperationException($"The {FrequencyTable<T>._ClassName} is empty.");
             }
 
-            ICollection<T> min = new List<T>();
-            
-            for (int i = 0; i < this._Items.Count; i ++)
-            {
-                if (this._Frequencies[i] == this._MinFrequency)
-                {
-                    min.Add(this._Items[i]);
-                }
-            }
-
-            return min;
+            return this._GetRange(minFrequency, maxFrequency);
         }
-
-        public IEnumerable<T> GetRange(int frequency) => throw new NotImplementedException();
-        public IEnumerable<T> GetRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
 #endregion
 
 #region Remove functionality
         /// <summary>
-        /// Removes an item from the <see cref="FrequencyTable{T}" />.
+        /// Decreases the frequency of the specified item in the <see cref="FrequencyTable{T}" />.
         /// </summary>
-        /// <param name="item">The item to remove from the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
+        /// <param name="item">The item to decrease the frequency of in the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
         /// <returns><c>true</c> if <c><paramref name="item" /></c> is successfully removed; otherwise, <c>false</c>. This method also returns <c>false</c> if <c><paramref name="item" /></c> was not found in the <see cref="FrequencyTable{T}" />.</returns>
         public bool Remove(T item) => this._Remove(item, 1);
 
@@ -596,11 +639,73 @@ namespace Shipstone.System.Collections
         /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than 0.</exception>
         public bool Remove(T item, int frequency) => frequency < 0 ? throw new ArgumentOutOfRangeException(nameof (frequency)) : frequency > 0 && this._Remove(item, frequency);
         
-        public int RemoveAll(T item) => throw new NotImplementedException();
-        public int RemoveAll(Predicate<T> match) => throw new NotImplementedException();
-        public int RemoveRange(IEnumerable<T> collection) => throw new NotImplementedException();
-        public int RemoveRange(int frequency) => throw new NotImplementedException();
-        public int RemoveRange(int minFrequency, int maxFrequency) => throw new NotImplementedException();
+        /// <summary>
+        /// Removes all occurrences of the specified item from the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="item">The item to remove from the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
+        /// <returns>The frequency of <c><paramref name="item" /></c> before removal.</returns>
+        public int RemoveAll(T item)
+        {
+            int index = this._Items.IndexOf(item);
+            return index == -1 ? 0 : this._RemoveAll(index);
+        }
+        
+        /// <summary>
+        /// Removes all occurrences of items with the specified frequency from the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="frequency">The frequency of items to remove.</param>
+        /// <returns>The total number of items removed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than or equal to 0.</exception>
+        public int RemoveAllRange(int frequency) => frequency <= 0 ? throw new ArgumentOutOfRangeException(nameof (frequency)) : this._RemoveAllRange(frequency, frequency);
+        
+        /// <summary>
+        /// Removes all occurrences of items within the specified inclusive frequency range from the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="minFrequency">The minimum frequency of items to remove.</param>
+        /// <param name="maxFrequency">The maximum frequency of items to remove.</param>
+        /// <returns>The total number of items removed.</returns>
+        /// <exception cref="ArgumentException"><c><paramref name="maxFrequency" /></c> is less than <c><paramref name="minFrequency" /></c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="minFrequency" /></c> is less than or equal to 0 -or- <c><paramref name="maxFrequency" /></c> is less than or equal to 0.</exception>
+        public int RemoveAllRange(int minFrequency, int maxFrequency)
+        {
+            if (minFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (minFrequency));
+            }
+
+            if (maxFrequency <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof (maxFrequency));
+            }
+
+            if (maxFrequency < minFrequency)
+            {
+                throw new ArgumentException($"{nameof (maxFrequency)} is less than {nameof (minFrequency)}.");
+            }
+
+            return this._RemoveAllRange(minFrequency, maxFrequency);
+        }
+
+        /// <summary>
+        /// Decreases the frequency of the each item from the specified collection in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="collection">An <see cref="IEnumerable{T}" /> containing items to decrease the frequency of in the <see cref="FrequencyTable{T}" />. The collection itself cannot be <c>null</c>, but it can contain items that are <c>null</c>, if <c><typeparamref name="T" /></c> is a reference type.</param>
+        /// <returns>The number of items removed.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public int RemoveRange(IEnumerable<T> collection)
+        {
+            int sum = 0;
+
+            foreach (T item in collection ?? throw new ArgumentNullException(nameof (collection)))
+            {
+                if (this._Remove(item, 1))
+                {
+                    ++ sum;
+                }
+            }
+
+            return sum;
+        }
 #endregion
 
         /// <summary>
@@ -637,6 +742,7 @@ namespace Shipstone.System.Collections
             this._NotifyEnumerators();
         }
 
+#region ToArray methods
         /// <summary>
         /// Copies the items of the <see cref="FrequencyTable{T}" /> to a new array.
         /// </summary>
@@ -695,6 +801,7 @@ namespace Shipstone.System.Collections
             this._CopyTo(array, 0, minFrequency, maxFrequency);
             return array;
         }
+#endregion
 #endregion
     }
 }
