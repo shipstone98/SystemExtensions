@@ -12,7 +12,7 @@ namespace Shipstone.SystemTest
     {
         private const int _SampleLength = 40;
 
-        private static readonly Random _Random;
+        internal static readonly Random _Random;
 
         private FrequencyTable<int> _Table;
 
