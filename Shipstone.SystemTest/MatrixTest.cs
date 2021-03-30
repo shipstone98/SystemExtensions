@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Shipstone.System.Numerics;
@@ -670,6 +671,102 @@ namespace Shipstone.SystemTest
 
         [TestMethod]
         public void TestUnaryNegation_Null() => Assert.ThrowsException<ArgumentNullException>(() => - (null as Matrix));
+#endregion
+
+#region ToString tests
+        [TestMethod]
+        public void TestToString_Empty()
+        {
+            String line = String.Join(' ', new int[this._Matrix.Columns]);
+            StringBuilder expected = new StringBuilder();
+            expected.Append(line);
+
+            for (int i = 1; i < this._Matrix.Rows; i ++)
+            {
+                expected.AppendLine();
+                expected.Append(line);
+            }
+
+            Assert.AreEqual(expected.ToString(), this._Matrix.ToString());
+        }
+
+        [TestMethod]
+        public void TestToString_SingleEntry()
+        {
+            this._Matrix = new Matrix(1, 1);
+            double dbl = FrequencyTableTest._Random.NextDouble();
+            this._Matrix[0, 0] = dbl;
+            Assert.AreEqual(dbl.ToString(), this._Matrix.ToString());
+        }
+
+        [TestMethod]
+        public void TestToString_NotEmpty_DifferentLength()
+        {
+            const int SIZE = 3;
+            this._Matrix = new Matrix(SIZE, SIZE);
+            this._Matrix[0, 0] = 0.713;
+            this._Matrix[0, 1] = 0.7133;
+            this._Matrix[0, 2] = 0.71333;
+            this._Matrix[1, 0] = 0.713333;
+            this._Matrix[1, 1] = 0.7133333;
+            this._Matrix[1, 2] = 0.71333333;
+            this._Matrix[2, 0] = 0.713333333;
+            this._Matrix[2, 1] = 0.7133333333;
+            this._Matrix[2, 2] = 0.71333333333;
+            String baseString = "0.713";
+            int pad = 0.71333333333.ToString().Length;
+            StringBuilder expected = new StringBuilder();
+            expected.Append(baseString.PadLeft(pad));
+            baseString += "3";
+
+            for (int i = 1; i < SIZE; i ++)
+            {
+                expected.Append(' ');
+                expected.Append(baseString.ToString().PadLeft(pad));
+                baseString += "3";
+            }
+            
+            for (int i = 1; i < SIZE; i ++)
+            {
+                expected.AppendLine();
+                expected.Append(baseString.ToString().PadLeft(pad));
+                baseString += "3";
+
+                for (int j = 1; j < SIZE; j ++)
+                {
+                    expected.Append(' ');
+                    expected.Append(baseString.ToString().PadLeft(pad));
+                    baseString += "3";
+                }
+            }
+
+            Assert.AreEqual(expected.ToString(), this._Matrix.ToString());
+        }
+
+        [TestMethod]
+        public void TestToString_NotEmpty_SameLength()
+        {
+            const int SIZE = 4;
+            this._Matrix = new Matrix(SIZE, SIZE);
+            
+            for (int i = 0; i < SIZE; i ++)
+            {
+                for (int j = 0; j < SIZE;)
+                {
+                    this._Matrix[i, j] = ++ j;
+                }
+            }
+
+            StringBuilder expected = new StringBuilder();
+
+            for (int i = 0; i < SIZE - 1; i ++)
+            {
+                expected.AppendLine(String.Join(' ', new int[SIZE] { 1, 2, 3, 4 }));
+            }
+
+            expected.Append(String.Join(' ', new int[SIZE] { 1, 2, 3, 4 }));
+            Assert.AreEqual(expected.ToString(), this._Matrix.ToString());
+        }
 #endregion
     }
 }

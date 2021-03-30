@@ -103,6 +103,7 @@ Extension classes to .NET Standard 2.0.
 - public Matrix Multiply(double scalar): multiples all entries in the current Matrix instance by scalar and returns the result as a new Matrix
 - public Matrix Multiply(Matrix matrix): multiples the current Matrix instance by matrix and returns the result as a new Matrix
 - public Matrix Subtract(Matrix matrix): subtracts matrix from the current Matrix instance and returns the result as a new Matrix
+- public override String ToString(): returns a string that represents the matrix
 
 #### Operators
 - public static Matrix operator +(Matrix a, Matrix b): adds one Matrix to another and returns the result as a new Matrix

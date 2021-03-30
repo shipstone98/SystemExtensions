@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Shipstone.System.Numerics
 {
@@ -367,8 +368,59 @@ namespace Shipstone.System.Numerics
         /// <exception cref="ArgumentNullException"><c><paramref name="matrix" /></c> is <c>null</c>.</exception>
         public Matrix Subtract(Matrix matrix) => this._Add(matrix, true);
 
-        public override String ToString() => this.ToString(false);
-        public String ToString(bool includeBorders) => throw new NotImplementedException();
+        /// <summary>
+        /// Returns a string that represents the matrix.
+        /// </summary>
+        /// <returns>The string representation of the <see cref="Matrix" />.</returns>
+        public override String ToString()
+        {
+            String[,] array = new String[this._Rows, this._Columns];
+            int maxLength = 0;
+
+            for (int i = 0; i < this._Rows; i ++)
+            {
+                for (int j = 0; j < this._Columns; j ++)
+                {
+                    String s = array[i, j] = this._Array[i, j].ToString();
+
+                    if (s.Length > maxLength)
+                    {
+                        maxLength = s.Length;
+                    }
+                }
+            }
+            
+            for (int i = 0; i < this._Rows; i ++)
+            {
+                for (int j = 0; j < this._Columns; j ++)
+                {
+                    array[i, j] = array[i, j].PadLeft(maxLength);
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(array[0, 0]);
+
+            for (int i = 1; i < this._Columns; i ++)
+            {
+                sb.Append(' ');
+                sb.Append(array[0, i]);
+            }
+
+            for (int i = 1; i < this._Rows; i ++)
+            {
+                sb.AppendLine();
+                sb.Append(array[i, 0]);
+
+                for (int j = 1; j < this._Columns; j ++)
+                {
+                    sb.Append(' ');
+                    sb.Append(array[i, j]);
+                }
+            }
+
+            return sb.ToString();
+        }
 
         private static Matrix _Add(Matrix a, Matrix b, bool subtract)
         {
