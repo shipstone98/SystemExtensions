@@ -6,48 +6,35 @@ namespace Shipstone.System.Collections
 {
     partial class FrequencyTable<T>
     {
-        private class Enumerator : IEnumerator<T>
+        private struct Enumerator : IEnumerator<T>
         {
             private T _Current;
             private int _Frequency;
             private int _Index;
-            private bool _IsDisposed;
-            internal bool _IsModified;
             private readonly FrequencyTable<T> _Table;
+            private readonly int _Version;
 
             public T Current => this._Current;
             Object IEnumerator.Current => this._Current;
 
             internal Enumerator(FrequencyTable<T> table)
             {
+                this._Current = default (T);
+                this._Frequency = 0;
                 this._Index = -1;
                 this._Table = table;
-                this._Table._Enumerators.Add(this);
+                this._Version = table._Version;
             }
 
             private void _CheckState()
             {
-                if (this._IsDisposed)
-                {
-                    throw new ObjectDisposedException(this.GetType().FullName);
-                }
-
-                if (this._IsModified)
+                if (this._Version != this._Table._Version)
                 {
                     throw new InvalidOperationException("The collection was modified after the enumerator was created.");
                 }
             }
 
-            public void Dispose()
-            {
-                if (!this._IsDisposed)
-                {
-                    this._Table._Enumerators.Remove(this);
-                    this._IsDisposed = true;
-                }
-
-                GC.SuppressFinalize(this);
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {

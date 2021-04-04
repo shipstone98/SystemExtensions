@@ -13,11 +13,11 @@ namespace Shipstone.System.Collections
         private const String _ClassName = "FrequencyTable<T>";
 
         private int _Count;
-        private readonly ICollection<FrequencyTable<T>.Enumerator> _Enumerators;
         private readonly IList<int> _Frequencies;
         private readonly IList<T> _Items;
         private int _MaxFrequency;
         private int _MinFrequency;
+        private int _Version;
 
 #region Properties
         /// <summary>
@@ -106,7 +106,7 @@ namespace Shipstone.System.Collections
                 }
 
                 this._ResetMaxMin();
-                this._NotifyEnumerators();
+                ++ this._Version;
             }
         }
 #endregion
@@ -117,7 +117,6 @@ namespace Shipstone.System.Collections
         /// </summary>
         public FrequencyTable()
         {
-            this._Enumerators = new LinkedList<FrequencyTable<T>.Enumerator>();
             this._Frequencies = new List<int>();
             this._Items = new List<T>();
         }
@@ -131,7 +130,7 @@ namespace Shipstone.System.Collections
         {
             foreach (T item in collection ?? throw new ArgumentNullException(nameof (collection)))
             {
-                this._Add(item, 1);
+                this._Add(item, 1, false);
             }
         }
 
@@ -148,7 +147,6 @@ namespace Shipstone.System.Collections
             }
 
             this._Count = table._Count;
-            this._Enumerators = new LinkedList<FrequencyTable<T>.Enumerator>();
             this._Frequencies = new List<int>(table._Frequencies);
             this._Items = new List<T>(table._Items);
             this._MaxFrequency = table._MaxFrequency;
@@ -157,7 +155,7 @@ namespace Shipstone.System.Collections
 #endregion
 
 #region Private methods
-        private void _Add(T item, int frequency)
+        private void _Add(T item, int frequency, bool newVersion)
         {
             int index = this._Items.IndexOf(item);
 
@@ -174,7 +172,11 @@ namespace Shipstone.System.Collections
 
             this._Count += frequency;
             this._ResetMaxMin();
-            this._NotifyEnumerators();
+
+            if (newVersion)
+            {
+                ++ this._Version;
+            }
         }
 
         private void _CopyTo(T[] array, int arrayIndex, int minFrequency, int maxFrequency)
@@ -233,15 +235,7 @@ namespace Shipstone.System.Collections
             return range;
         }
 
-        private void _NotifyEnumerators()
-        {
-            foreach (FrequencyTable<T>.Enumerator enumerator in this._Enumerators)
-            {
-                enumerator._IsModified = true;
-            }
-        }
-
-        private bool _Remove(T item, int frequency)
+        private bool _Remove(T item, int frequency, bool newVersion)
         {
             int index = this._Items.IndexOf(item);
 
@@ -257,7 +251,7 @@ namespace Shipstone.System.Collections
 
             if (this._Frequencies[index] == frequency)
             {
-                this._RemoveAll(index);
+                this._RemoveAll(index, newVersion);
                 return true;
             }
             
@@ -268,22 +262,32 @@ namespace Shipstone.System.Collections
 
             this._Count -= frequency;
             this._ResetMaxMin();
-            this._NotifyEnumerators();
+            
+            if (newVersion)
+            {
+                ++ this._Version;
+            }
+
             return true;
         }
 
-        private int _RemoveAll(int index)
+        private int _RemoveAll(int index, bool newVersion)
         {
             int freq = this._Frequencies[index];
             this._Items.RemoveAt(index);
             this._Frequencies.RemoveAt(index);
             this._Count -= freq;
             this._ResetMaxMin();
-            this._NotifyEnumerators();
+
+            if (newVersion)
+            {
+                ++ this._Version;
+            }
+            
             return freq;
         }
 
-        private int _RemoveAllRange(int minFrequency, int maxFrequency)
+        private int _RemoveAllRange(int minFrequency, int maxFrequency, bool newVersion)
         {
             int sum = 0;
 
@@ -303,7 +307,12 @@ namespace Shipstone.System.Collections
 
             this._Count -= sum;
             this._ResetMaxMin();
-            this._NotifyEnumerators();
+
+            if (newVersion)
+            {
+                ++ this._Version;
+            }
+
             return sum;
         }
 
@@ -339,7 +348,7 @@ namespace Shipstone.System.Collections
         /// Increases the frequency of the specified item in the <see cref="FrequencyTable{T}" />.
         /// </summary>
         /// <param name="item">The item to be added to the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
-        public void Add(T item) => this._Add(item, 1);
+        public void Add(T item) => this._Add(item, 1, true);
 
         /// <summary>
         /// Increases the frequency of the specified item in the <see cref="FrequencyTable{T}" />.
@@ -356,7 +365,7 @@ namespace Shipstone.System.Collections
 
             if (frequency > 0)
             {
-                this._Add(item, frequency);
+                this._Add(item, frequency, true);
             }
         }
 
@@ -369,7 +378,7 @@ namespace Shipstone.System.Collections
         {
             foreach (T item in collection ?? throw new ArgumentNullException(nameof (collection)))
             {
-                this._Add(item, 1);
+                this._Add(item, 1, true);
             }
         }
 #endregion
@@ -379,10 +388,13 @@ namespace Shipstone.System.Collections
         /// </summary>
         public void Clear()
         {
-            this._Count = this._MaxFrequency = this._MinFrequency = 0;
-            this._Frequencies.Clear();
-            this._Items.Clear();
-            this._NotifyEnumerators();
+            if (this._Count > 0)
+            {
+                this._Count = this._MaxFrequency = this._MinFrequency = 0;
+                this._Frequencies.Clear();
+                this._Items.Clear();
+                ++ this._Version;
+            }
         }
 
         /// <summary>
@@ -628,7 +640,7 @@ namespace Shipstone.System.Collections
         /// </summary>
         /// <param name="item">The item to decrease the frequency of in the <see cref="FrequencyTable{T}" />. The value can be <c>null</c> for reference types.</param>
         /// <returns><c>true</c> if <c><paramref name="item" /></c> is successfully removed; otherwise, <c>false</c>. This method also returns <c>false</c> if <c><paramref name="item" /></c> was not found in the <see cref="FrequencyTable{T}" />.</returns>
-        public bool Remove(T item) => this._Remove(item, 1);
+        public bool Remove(T item) => this._Remove(item, 1, true);
 
         /// <summary>
         /// Decreases the frequency of the specified item in the <see cref="FrequencyTable{T}" />.
@@ -637,7 +649,7 @@ namespace Shipstone.System.Collections
         /// <param name="frequency">The decrease to increase the current frequency of <c><paramref name="item" /></c> by.</param>
         /// <returns><c>true</c> if <c><paramref name="item" /></c> is successfully decreased by at most <c><paramref name="frequency" /></c>; otherwise, <c>false</c>. This method also returns <c>false</c> if <c><paramref name="item" /></c> was not found in the <see cref="FrequencyTable{T}" />.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than 0.</exception>
-        public bool Remove(T item, int frequency) => frequency < 0 ? throw new ArgumentOutOfRangeException(nameof (frequency)) : frequency > 0 && this._Remove(item, frequency);
+        public bool Remove(T item, int frequency) => frequency < 0 ? throw new ArgumentOutOfRangeException(nameof (frequency)) : frequency > 0 && this._Remove(item, frequency, true);
         
         /// <summary>
         /// Removes all occurrences of the specified item from the <see cref="FrequencyTable{T}" />.
@@ -647,7 +659,7 @@ namespace Shipstone.System.Collections
         public int RemoveAll(T item)
         {
             int index = this._Items.IndexOf(item);
-            return index == -1 ? 0 : this._RemoveAll(index);
+            return index == -1 ? 0 : this._RemoveAll(index, true);
         }
         
         /// <summary>
@@ -656,7 +668,7 @@ namespace Shipstone.System.Collections
         /// <param name="frequency">The frequency of items to remove.</param>
         /// <returns>The total number of items removed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="frequency" /></c> is less than or equal to 0.</exception>
-        public int RemoveAllRange(int frequency) => frequency <= 0 ? throw new ArgumentOutOfRangeException(nameof (frequency)) : this._RemoveAllRange(frequency, frequency);
+        public int RemoveAllRange(int frequency) => frequency <= 0 ? throw new ArgumentOutOfRangeException(nameof (frequency)) : this._RemoveAllRange(frequency, frequency, true);
         
         /// <summary>
         /// Removes all occurrences of items within the specified inclusive frequency range from the <see cref="FrequencyTable{T}" />.
@@ -683,7 +695,7 @@ namespace Shipstone.System.Collections
                 throw new ArgumentException($"{nameof (maxFrequency)} is less than {nameof (minFrequency)}.");
             }
 
-            return this._RemoveAllRange(minFrequency, maxFrequency);
+            return this._RemoveAllRange(minFrequency, maxFrequency, true);
         }
 
         /// <summary>
@@ -698,7 +710,7 @@ namespace Shipstone.System.Collections
 
             foreach (T item in collection ?? throw new ArgumentNullException(nameof (collection)))
             {
-                if (this._Remove(item, 1))
+                if (this._Remove(item, 1, true))
                 {
                     ++ sum;
                 }
@@ -739,7 +751,7 @@ namespace Shipstone.System.Collections
                 this._Frequencies[bIndex] = temp;
             }
 
-            this._NotifyEnumerators();
+            ++ this._Version;
         }
 
 #region ToArray methods

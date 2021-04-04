@@ -735,8 +735,6 @@ namespace Shipstone.SystemTest
             using (IEnumerator<int> enumerator = this._Table.GetEnumerator())
             {
                 enumerator.Dispose();
-                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.MoveNext());
-                Assert.ThrowsException<ObjectDisposedException>(() => enumerator.Reset());
                 int current = enumerator.Current;
             }
         }
