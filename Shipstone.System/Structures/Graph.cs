@@ -15,29 +15,29 @@ namespace Shipstone.System.Structures
         private readonly ICollection<Graph<TEdge, TVertex>.Vertex> _Vertices;
 
         /// <summary>
-        /// Gets the number of vertices contained in the graph.
+        /// Gets the number of vertices contained in the current <see cref="Graph{TEdge, TVertex}" />.
         /// </summary>
-        /// <value>The number of vertices contained in the graph.</value>
+        /// <value>The number of vertices contained in the current <see cref="Graph{TEdge, TVertex}" />.</value>
         public int Count => this._Vertices.Count;
 
         /// <summary>
-        /// Gets a collection containing the edges connecting vertices contained in the graph.
+        /// Gets a collection containing the edges connecting vertices contained in the current <see cref="Graph{TEdge, TVertex}" />.
         /// </summary>
-        /// <value>A collection containing the edges connecting vertices contained in the graph.</value>
+        /// <value>A collection containing the edges connecting vertices contained in the current <see cref="Graph{TEdge, TVertex}" />.</value>
         public IEnumerable<Graph<TEdge, TVertex>.Edge> Edges => this._Edges;
 
         /// <summary>
-        /// Gets a value indicating whether the graph is directed. A directed graph is one whose edges may only be traversed from the source to the destination vertices.
+        /// Gets a value indicating whether the current <see cref="Graph{TEdge, TVertex}" /> is directed. A directed graph is one whose edges may only be traversed from the source to the destination vertices.
         /// </summary>
-        /// <value><c>true</c> if the graph is directed (i.e. uni-directional); otherwise, <c>false</c> if the graph is bi-directional.</value>
+        /// <value><c>true</c> if the current <see cref="Graph{TEdge, TVertex}" /> is directed (i.e. uni-directional); otherwise, <c>false</c> if the graph is bi-directional.</value>
         public bool IsDirected { get; }
 
         bool ICollection<Graph<TEdge, TVertex>.Vertex>.IsReadOnly => false;
 
         /// <summary>
-        /// Gets a collection containing vertices contained in the graph.
+        /// Gets a collection containing vertices contained in the current <see cref="Graph{TEdge, TVertex}" />.
         /// </summary>
-        /// <value>A collection containing vertices contained in the graph.</value>
+        /// <value>A collection containing vertices contained in the current <see cref="Graph{TEdge, TVertex}" />.</value>
         public IEnumerable<Graph<TEdge, TVertex>.Vertex> Vertices => this._Vertices;
 
         /// <summary>
@@ -53,7 +53,28 @@ namespace Shipstone.System.Structures
 
         public Graph(Graph<TEdge, TVertex> graph) => throw new NotImplementedException();
 
-        public void Add(Graph<TEdge, TVertex>.Vertex vertex) => throw new NotImplementedException();
+        /// <summary>
+        /// Adds the specified <see cref="Graph{TEdge, TVertex}.Vertex" /> to the current <see cref="Graph{TEdge, TVertex}" />.
+        /// </summary>
+        /// <param name="vertex">The <see cref="Graph{TEdge, TVertex}.Vertex" /> to add to the current <see cref="Graph{TEdge, TVertex}" />.</param>
+        /// <exception cref="ArgumentNullException"><c><paramref name="vertex" /></c> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><c><paramref name="vertex" /></c> belongs to another <see cref="Graph{TEdge, TVertex}" />.</exception>
+        public void Add(Graph<TEdge, TVertex>.Vertex vertex)
+        {
+            if (vertex is null)
+            {
+                throw new ArgumentNullException(nameof (vertex));
+            }
+
+            if (!(vertex.Graph is null))
+            {
+                throw new InvalidOperationException(nameof (vertex) + " belongs to another Graph<TEdge, TVertex>.");
+            }
+
+            this._Vertices.Add(vertex);
+            vertex.Graph = this;
+        }
+
         public void AddRange(IEnumerable<Graph<TEdge, TVertex>.Vertex> collection) => throw new NotImplementedException();
         public void Clear() => throw new NotImplementedException();
         public bool Contains(Graph<TEdge, TVertex>.Vertex vertex) => throw new NotImplementedException();
