@@ -68,7 +68,7 @@ Extension classes to .NET Standard 2.0.
 - IEnumerator IEnumerable.GetEnumerator()
 
 ## Shipstone.System.Numerics
-- public static class MathExtensions: provides static methods for common mathematical and statistical functions
+- public static class MathExtensions: provides static (Shared in Visual Basic) methods for common mathematical and statistical functions
 - public class Matrix: represents a matrix of specified size
 
 ### MathExtensions
