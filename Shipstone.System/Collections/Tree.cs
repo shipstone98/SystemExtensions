@@ -125,9 +125,34 @@ namespace Shipstone.System.Collections
 
         public void Clear() => this.Clear(this.Root);
         public void Clear(TreeBranch<T> branch) => throw new NotImplementedException();
-        public bool Contains(T val) => this.Contains(this.Root, val);
+
+        /// <summary>
+        /// Determines whether the specified value is found under the root branch of the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <param name="val">The value to locate under the root branch of the <see cref="Tree{T}" />. The value can be <c>null</c> for reference types.</param>
+        /// <returns><c>true</c> if <c><paramref name="val" /></c> is found under the root branch; otherwise, <c>false</c>.</returns>
+        public bool Contains(T val)
+        {
+            this.Find(this.Root, val, out int count);
+            return count > 0;
+        }
+
         public bool Contains(TreeBranch<T> branch) => this.Contains(this.Root, branch);
-        public bool Contains(TreeBranch<T> branch, T val) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Determines whether the specified value is found under the specified <see cref="TreeBranch{T}" /> contained in the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <param name="branch">The <see cref="TreeBranch{T}" /> contained in the <see cref="Tree{T}" /> to search.</param>
+        /// <param name="val">The value to locate under <c><paramref name="branch" /></c>. The value can be <c>null</c> for reference types.</param>
+        /// <returns><c>true</c> if <c><paramref name="val" /></c> is found under the root branch; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="branch" /></c> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><c><paramref name="branch" /></c> does not belong to the current <see cref="Tree{T}" />.</exception>
+        public bool Contains(TreeBranch<T> branch, T val)
+        {
+            this.Find(branch, val, out int count);
+            return count > 0;
+        }
+
         public bool Contains(TreeBranch<T> branch, TreeBranch<T> childBranch) => throw new NotImplementedException();
         public void CopyTo(T[] array) => this.CopyTo(this.Root, array, 0);
         public void CopyTo(T[] array, int arrayIndex) => this.CopyTo(this.Root, array, arrayIndex);
@@ -137,8 +162,64 @@ namespace Shipstone.System.Collections
         public void CopyTo(TreeBranch<T> branch, T[] array, int arrayIndex) => throw new NotImplementedException();
         public void CopyTo(TreeBranch<T> branch, TreeBranch<T>[] array) => throw new NotImplementedException();
         public void CopyTo(TreeBranch<T> branch, TreeBranch<T>[] array, int arrayIndex) => throw new NotImplementedException();
-        public TreeBranch<T> Find(T val) => this.Find(this.Root, val);
-        public TreeBranch<T> Find(TreeBranch<T> branch, T val) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Finds all branches under the root node in the <see cref="Tree{T}" /> that contain the specified value.
+        /// </summary>
+        /// <param name="val">The value to locate under the root branch of the <see cref="Tree{T}" />.</param>
+        /// <returns>A collection containing all branches under the root node in the <see cref="Tree{T}" /> that contain the specified value.</returns>
+        public IEnumerable<TreeBranch<T>> Find(T val) => this.Find(this.Root, val, out int count);
+        
+        /// <summary>
+        /// Finds all branches under the specified <see cref="TreeBranch{T}" /> in the <see cref="Tree{T}" /> that contain the specified value.
+        /// </summary>
+        /// <param name="branch">The parent <see cref="TreeBranch{T}" /> contained in the <see cref="Tree{T}" /> to search.</param>
+        /// <param name="val">The value to locate under <c><paramref name="branch" /></c>.</param>
+        /// <returns>A collection containing all branches under the specified <see cref="TreeBranch{T}" /> in the <see cref="Tree{T}" /> that contain the specified value.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="branch" /></c> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><c><paramref name="branch" /></c> does not belong to the current <see cref="Tree{T}" />.</exception>
+        public IEnumerable<TreeBranch<T>> Find(TreeBranch<T> branch, T val) => this.Find(branch, val, out int count);
+
+        private IEnumerable<TreeBranch<T>> Find(TreeBranch<T> branch, T val, out int count)
+        {
+            if (branch is null)
+            {
+                throw new ArgumentNullException(nameof (branch));
+            }
+
+            if (!Object.ReferenceEquals(this, branch.Tree))
+            {
+                throw new InvalidOperationException($"{nameof (branch)} does not belong to the current Tree<T>.");
+            }
+
+            ICollection<TreeBranch<T>> matches = new List<TreeBranch<T>>();
+
+            if (val == null)
+            {
+                foreach (TreeBranch<T> child in branch)
+                {
+                    if (child.Value == null)
+                    {
+                        matches.Add(child);
+                    }
+                }
+            }
+
+            else
+            {
+                foreach (TreeBranch<T> child in branch)
+                {
+                    if (val.Equals(child.Value))
+                    {
+                        matches.Add(child);
+                    }
+                }
+            }
+
+            count = matches.Count;
+            return matches;
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => this.Root._Children.GetEnumerator();
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException();
 
