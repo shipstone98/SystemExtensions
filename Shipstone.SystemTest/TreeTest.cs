@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Shipstone.System.Collections;
@@ -166,5 +167,43 @@ namespace Shipstone.SystemTest
 
         [TestMethod]
         public void TestAdd_TreeBranch_TreeBranch_ParentNull() => Assert.ThrowsException<ArgumentNullException>(() => this._Tree.Add(null, new TreeBranch<int>(0)));
+
+        [TestMethod]
+        public void TestContains_T()
+        {
+            const int MAX = 100;
+            int[] array = new int[10];
+
+            for (int i = 0; i < array.Length; i ++)
+            {
+                array[i] = TreeTest._Random.Next(MAX);
+                this._Tree.Add(array[i]);
+            }
+
+            for (int i = 0; i < MAX; i ++)
+            {
+                Assert.AreEqual(array.Contains(i), this._Tree.Contains(i));
+            }
+        }
+
+        [TestMethod]
+        public void TestContains_TreeBranch_T()
+        {
+            const int MAX = 100;
+            TreeBranch<int> branch = this._Tree.Add(MAX + 1);
+            int[] array = new int[10];
+
+            for (int i = 0; i < array.Length; i ++)
+            {
+                array[i] = TreeTest._Random.Next(MAX);
+                this._Tree.Add(branch, array[i]);
+            }
+
+            for (int i = 0; i < MAX; i ++)
+            {
+                Assert.IsFalse(this._Tree.Contains(i));
+                Assert.AreEqual(array.Contains(i), this._Tree.Contains(branch, i));
+            }
+        }
     }
 }
