@@ -119,6 +119,43 @@ namespace Shipstone.SystemTest
         }
 
         [TestMethod]
+        public void TestAdd_TreeBranch_TreeBranch()
+        {
+            int parentVal = TreeTest._Random.Next();
+            TreeBranch<int> parent = this._Tree.Add(parentVal);
+            int childVal = TreeTest.NextRandomNotEquals(parentVal);
+            TreeBranch<int> child = new TreeBranch<int>(childVal);
+            this._Tree.Add(parent, child);
+            this.AssertTree(1, 2);
+            this.AssertRoot(1, 2, this._Tree, TreeTest._DefaultValue);
+            TreeTest.AssertBranch(parent, 1, this._Tree.Root, 1, this._Tree, parentVal);
+            TreeTest.AssertBranch(child, 0, parent, 0, this._Tree, childVal);
+        }
+
+        [TestMethod]
+        public void TestAdd_TreeBranch_TreeBranch_ChildBelongs()
+        {
+            Tree<int> newTree = new Tree<int>(0);
+            int val = TreeTest._Random.Next();
+            TreeBranch<int> child = new TreeBranch<int>(val);
+            TreeBranch<int> parent = new TreeBranch<int>(val);
+            this._Tree.Add(parent);
+            newTree.Add(child);
+            Exception ex = Assert.ThrowsException<InvalidOperationException>(() => this._Tree.Add(parent, child));
+            Assert.AreEqual("childBranch belongs to another Tree<T>.", ex.Message);
+        }
+
+        [TestMethod]
+        public void TestAdd_TreeBranch_TreeBranch_ParentNotBelongs()
+        {
+            int val = TreeTest._Random.Next();
+            TreeBranch<int> child = new TreeBranch<int>(val);
+            TreeBranch<int> parent = new TreeBranch<int>(val);
+            Exception ex = Assert.ThrowsException<InvalidOperationException>(() => this._Tree.Add(parent, child));
+            Assert.AreEqual("branch does not belong to the current Tree<T>.", ex.Message);
+        }
+
+        [TestMethod]
         public void TestAdd_TreeBranch_T_BranchNull() => Assert.ThrowsException<ArgumentNullException>(() => this._Tree.Add(null, TreeTest._Random.Next()));
 
         [TestMethod]
