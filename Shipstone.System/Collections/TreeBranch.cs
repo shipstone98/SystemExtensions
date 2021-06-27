@@ -63,7 +63,13 @@ namespace Shipstone.System.Collections
         internal void DecreaseTotalCount() => throw new NotImplementedException();
         IEnumerator IEnumerable.GetEnumerator() => this._Children.GetEnumerator();
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the child branches contained under the <see cref="TreeBranch{T}" />.
+        /// </summary>
+        /// <returns>An enumerator that iterates through the child branches contained under the <see cref="TreeBranch{T}" />.</returns>
         public IEnumerator<TreeBranch<T>> GetEnumerator() => this._Children.GetEnumerator();
+
         internal void IncreaseTotalCount() => throw new NotImplementedException();
     }
 }
