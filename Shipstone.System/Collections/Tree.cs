@@ -45,26 +45,26 @@ namespace Shipstone.System.Collections
         public Tree(TreeBranch<T> root) => throw new NotImplementedException();
         public Tree(Tree<T> tree) => throw new NotImplementedException();
 
-        public TreeBranch<T> Add(T item) => throw new NotImplementedException();
-        void ICollection<T>.Add(T item) => this.Add(item);
-        public void Add(TreeBranch<T> branch) => throw new NotImplementedException();
+        public TreeBranch<T> Add(T item) => this.Add(this.Root, item);
+        void ICollection<T>.Add(T item) => this.Add(this.Root, item);
+        public void Add(TreeBranch<T> branch) => this.Add(this.Root, branch);
         public TreeBranch<T> Add(TreeBranch<T> branch, T item) => throw new NotImplementedException();
         public void Add(TreeBranch<T> branch, TreeBranch<T> childBranch) => throw new NotImplementedException();
-        public void Clear() => throw new NotImplementedException();
+        public void Clear() => this.Clear(this.Root);
         public void Clear(TreeBranch<T> branch) => throw new NotImplementedException();
-        public bool Contains(T item) => throw new NotImplementedException();
-        public bool Contains(TreeBranch<T> branch) => throw new NotImplementedException();
+        public bool Contains(T item) => this.Contains(this.Root, item);
+        public bool Contains(TreeBranch<T> branch) => this.Contains(this.Root, branch);
         public bool Contains(TreeBranch<T> branch, T item) => throw new NotImplementedException();
         public bool Contains(TreeBranch<T> branch, TreeBranch<T> childBranch) => throw new NotImplementedException();
-        public void CopyTo(T[] array) => throw new NotImplementedException();
-        public void CopyTo(T[] array, int arrayIndex) => throw new NotImplementedException();
-        public void CopyTo(TreeBranch<T>[] array) => throw new NotImplementedException();
-        public void CopyTo(TreeBranch<T>[] array, int arrayIndex) => throw new NotImplementedException();
+        public void CopyTo(T[] array) => this.CopyTo(this.Root, array, 0);
+        public void CopyTo(T[] array, int arrayIndex) => this.CopyTo(this.Root, array, arrayIndex);
+        public void CopyTo(TreeBranch<T>[] array) => this.CopyTo(this.Root, array, 0);
+        public void CopyTo(TreeBranch<T>[] array, int arrayIndex) => this.CopyTo(this.Root, array, arrayIndex);
         public void CopyTo(TreeBranch<T> branch, T[] array) => throw new NotImplementedException();
         public void CopyTo(TreeBranch<T> branch, T[] array, int arrayIndex) => throw new NotImplementedException();
         public void CopyTo(TreeBranch<T> branch, TreeBranch<T>[] array) => throw new NotImplementedException();
         public void CopyTo(TreeBranch<T> branch, TreeBranch<T>[] array, int arrayIndex) => throw new NotImplementedException();
-        public TreeBranch<T> Find(T item) => throw new NotImplementedException();
+        public TreeBranch<T> Find(T item) => this.Find(this.Root, item);
         public TreeBranch<T> Find(TreeBranch<T> branch, T item) => throw new NotImplementedException();
         IEnumerator IEnumerable.GetEnumerator() => this.Root._Children.GetEnumerator();
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException();
@@ -75,13 +75,13 @@ namespace Shipstone.System.Collections
         /// <returns>An enumerator that iterates through the child branches contained under the root branch of the <see cref="Tree{T}" />.</returns>
         public IEnumerator<TreeBranch<T>> GetEnumerator() => this.Root._Children.GetEnumerator();
 
-        public bool Remove(T item) => throw new NotImplementedException();
-        public bool Remove(TreeBranch<T> branch) => throw new NotImplementedException();
+        public bool Remove(T item) => this.Remove(this.Root, item);
+        public bool Remove(TreeBranch<T> branch) => this.Remove(this.Root, branch);
         public bool Remove(TreeBranch<T> branch, T item) => throw new NotImplementedException();
         public bool Remove(TreeBranch<T> branch, TreeBranch<T> childBranch) => throw new NotImplementedException();
-        public T[] ToArray() => throw new NotImplementedException();
+        public T[] ToArray() => this.ToArray(this.Root);
         public T[] ToArray(TreeBranch<T> branch) => throw new NotImplementedException();
-        public TreeBranch<T>[] ToBranchArray() => throw new NotImplementedException();
+        public TreeBranch<T>[] ToBranchArray() => this.ToBranchArray(this.Root);
         public TreeBranch<T>[] ToBranchArray(TreeBranch<T> branch) => throw new NotImplementedException();
     }
 }
