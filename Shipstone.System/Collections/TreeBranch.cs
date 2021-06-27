@@ -28,7 +28,7 @@ namespace Shipstone.System.Collections
         /// Gets the parent branch of the <see cref="TreeBranch{T}" />.
         /// </summary>
         /// <value>The parent branch of the <see cref="TreeBranch{T}" />. The value is <c>null</c> if the <see cref="TreeBranch{T}" /> has no parent and is the <see cref="Shipstone.System.Collections.Tree{T}.Root" /> of <see cref="Tree{T}" />.</value>
-        public TreeBranch<T> Parent { get; }
+        public TreeBranch<T> Parent { get; internal set; }
 
         /// <summary>
         /// Gets the total number of branches contained in all child branches of the <see cref="TreeBranch{T}" /> recursively.
@@ -60,7 +60,12 @@ namespace Shipstone.System.Collections
 
         internal TreeBranch(T val, Tree<T> tree) : this(val) => this.Tree = tree;
 
-        internal void DecreaseTotalCount() => throw new NotImplementedException();
+        internal void DecreaseTotalCount()
+        {
+            this.Parent?.DecreaseTotalCount();
+            -- this.TotalCount;
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => this._Children.GetEnumerator();
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException();
 
@@ -70,6 +75,10 @@ namespace Shipstone.System.Collections
         /// <returns>An enumerator that iterates through the child branches contained under the <see cref="TreeBranch{T}" />.</returns>
         public IEnumerator<TreeBranch<T>> GetEnumerator() => this._Children.GetEnumerator();
 
-        internal void IncreaseTotalCount() => throw new NotImplementedException();
+        internal void IncreaseTotalCount()
+        {
+            this.Parent?.IncreaseTotalCount();
+            ++ this.TotalCount;
+        }
     }
 }

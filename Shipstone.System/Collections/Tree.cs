@@ -7,7 +7,7 @@ namespace Shipstone.System.Collections
     /// <summary>
     /// Represents a tree capable of containing a variable number of branches.
     /// </summary>
-    /// <typeparam name="T">Specifies the element type of the items contained in branches in the tree.</typeparam>
+    /// <typeparam name="T">Specifies the element type of the vals contained in branches in the tree.</typeparam>
     public partial class Tree<T> : ICollection<T>, ICollection<TreeBranch<T>>, IReadOnlyCollection<T>, IReadOnlyCollection<TreeBranch<T>>
     {
         /// <summary>
@@ -45,16 +45,89 @@ namespace Shipstone.System.Collections
         public Tree(TreeBranch<T> root) => throw new NotImplementedException();
         public Tree(Tree<T> tree) => throw new NotImplementedException();
 
-        public TreeBranch<T> Add(T item) => this.Add(this.Root, item);
-        void ICollection<T>.Add(T item) => this.Add(this.Root, item);
-        public void Add(TreeBranch<T> branch) => this.Add(this.Root, branch);
-        public TreeBranch<T> Add(TreeBranch<T> branch, T item) => throw new NotImplementedException();
-        public void Add(TreeBranch<T> branch, TreeBranch<T> childBranch) => throw new NotImplementedException();
+        /// <summary>
+        /// Adds a new branch containing the specified value to the root branch of the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <param name="val">The value to add to the root branch of the <see cref="Tree{T}" />.</param>
+        /// <returns>The new <see cref="TreeBranch{T}" /> containing the specified value.</returns>
+        public TreeBranch<T> Add(T val) => this.Add(this.Root, val);
+
+        void ICollection<T>.Add(T val) => this.Add(this.Root, val);
+
+        /// <summary>
+        /// Adds the specified new branch to the root branch of the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <param name="branch">The <see cref="TreeBranch{T}" /> to add to the root branch of the <see cref="Tree{T}" />.</param>
+        /// <exception cref="ArgumentNullException"><c><paramref name="branch" /></c> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><c><paramref name="branch" /></c> belongs to another <see cref="Tree{T}" />.</exception>
+        public void Add(TreeBranch<T> branch)
+        {
+            try
+            {
+                this.Add(this.Root, branch);
+            }
+
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException($"{nameof (branch)} belongs to another Tree<T>.");
+            }
+        }
+
+        /// <summary>
+        /// Adds a new branch containing the specified value to the specified <see cref="TreeBranch{T}" /> contained in the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <param name="branch">The <see cref="TreeBranch{T}" /> to add the specified value to.</param>
+        /// <param name="val">The value to add to <c><paramref name="branch" /></c>.</param>
+        /// <returns>The new <see cref="TreeBranch{T}" /> containing the specified value.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="branch" /></c> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><c><paramref name="branch" /></c> does not belong to the current <see cref="Tree{T}" />.</exception>
+        public TreeBranch<T> Add(TreeBranch<T> branch, T val)
+        {
+            TreeBranch<T> child = new TreeBranch<T>(val);
+            this.Add(branch, child);
+            return child;
+        }
+
+        /// <summary>
+        /// Adds the specified new branch to the specified <see cref="TreeBranch{T}" /> contained in the <see cref="Tree{T}" />.
+        /// </summary>
+        /// <param name="branch">The <see cref="TreeBranch{T}" /> to add <c><paramref name="childBranch" /></c> to.</param>
+        /// <param name="childBranch">The <see cref="TreeBranch{T}" /> to add to <c><paramref name="branch" /></c>.</param>
+        /// <exception cref="ArgumentNullException"><c><paramref name="branch" /></c> is <c>null</c> -or- <c><paramref name="childBranch" /></c> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException"><c><paramref name="branch" /></c> does not belong to the current <see cref="Tree{T}" /> -or- <c><paramref name="childBranch" /></c> belongs to another <see cref="Tree{T}" />.</exception>
+        public void Add(TreeBranch<T> branch, TreeBranch<T> childBranch)
+        {
+            if (branch is null)
+            {
+                throw new ArgumentNullException(nameof (branch));
+            }
+
+            if (childBranch is null)
+            {
+                throw new ArgumentNullException(nameof (childBranch));
+            }
+
+            if (!Object.ReferenceEquals(this, branch.Tree))
+            {
+                throw new InvalidOperationException($"{nameof (branch)} does not belong to the current Tree<T>.");
+            }
+
+            if (!(childBranch.Tree is null))
+            {
+                throw new InvalidOperationException($"{nameof (childBranch)} belongs to another Tree<T>.");
+            }
+
+            branch._Children.Add(childBranch);
+            branch.IncreaseTotalCount();
+            childBranch.Parent = branch;
+            childBranch.Tree = this;
+        }
+
         public void Clear() => this.Clear(this.Root);
         public void Clear(TreeBranch<T> branch) => throw new NotImplementedException();
-        public bool Contains(T item) => this.Contains(this.Root, item);
+        public bool Contains(T val) => this.Contains(this.Root, val);
         public bool Contains(TreeBranch<T> branch) => this.Contains(this.Root, branch);
-        public bool Contains(TreeBranch<T> branch, T item) => throw new NotImplementedException();
+        public bool Contains(TreeBranch<T> branch, T val) => throw new NotImplementedException();
         public bool Contains(TreeBranch<T> branch, TreeBranch<T> childBranch) => throw new NotImplementedException();
         public void CopyTo(T[] array) => this.CopyTo(this.Root, array, 0);
         public void CopyTo(T[] array, int arrayIndex) => this.CopyTo(this.Root, array, arrayIndex);
@@ -64,8 +137,8 @@ namespace Shipstone.System.Collections
         public void CopyTo(TreeBranch<T> branch, T[] array, int arrayIndex) => throw new NotImplementedException();
         public void CopyTo(TreeBranch<T> branch, TreeBranch<T>[] array) => throw new NotImplementedException();
         public void CopyTo(TreeBranch<T> branch, TreeBranch<T>[] array, int arrayIndex) => throw new NotImplementedException();
-        public TreeBranch<T> Find(T item) => this.Find(this.Root, item);
-        public TreeBranch<T> Find(TreeBranch<T> branch, T item) => throw new NotImplementedException();
+        public TreeBranch<T> Find(T val) => this.Find(this.Root, val);
+        public TreeBranch<T> Find(TreeBranch<T> branch, T val) => throw new NotImplementedException();
         IEnumerator IEnumerable.GetEnumerator() => this.Root._Children.GetEnumerator();
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException();
 
@@ -75,9 +148,9 @@ namespace Shipstone.System.Collections
         /// <returns>An enumerator that iterates through the child branches contained under the root branch of the <see cref="Tree{T}" />.</returns>
         public IEnumerator<TreeBranch<T>> GetEnumerator() => this.Root._Children.GetEnumerator();
 
-        public bool Remove(T item) => this.Remove(this.Root, item);
+        public bool Remove(T val) => this.Remove(this.Root, val);
         public bool Remove(TreeBranch<T> branch) => this.Remove(this.Root, branch);
-        public bool Remove(TreeBranch<T> branch, T item) => throw new NotImplementedException();
+        public bool Remove(TreeBranch<T> branch, T val) => throw new NotImplementedException();
         public bool Remove(TreeBranch<T> branch, TreeBranch<T> childBranch) => throw new NotImplementedException();
         public T[] ToArray() => this.ToArray(this.Root);
         public T[] ToArray(TreeBranch<T> branch) => throw new NotImplementedException();
