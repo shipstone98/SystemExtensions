@@ -531,6 +531,48 @@ namespace Shipstone.SystemTest
         public void TestContainsAll_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.ContainsAll(null));
 #endregion
 
+#region ContainsAny tests
+        [TestMethod]
+        public void TestContainsAny_Empty()
+        {
+            int[] sample = FrequencyTableTest._Sample();
+            Assert.IsFalse(this._Table.ContainsAny(sample));
+            this._AssertProperties(0, 0, 0, 0);
+        }
+
+        [TestMethod]
+        public void TestContainsAny_NotEmpty_ContainsSome()
+        {
+            const int MAX = 20;
+            int[] sample = FrequencyTableTest._Sample(10, MAX, out Dictionary<int, int> dictionary);
+            int[] largerSample = new int[sample.Length + 1];
+            Array.Copy(sample, largerSample, sample.Length);
+            largerSample[sample.Length] = MAX;
+            this._Table = new(sample);
+            
+            foreach (int item in dictionary.Keys)
+            {
+                Assert.IsTrue(this._Table.ContainsAny(largerSample));
+            }
+
+            FrequencyTableTest._GetMaxMin(dictionary, out int min, out int max);
+            this._AssertProperties(sample.Length, dictionary.Count, min, max);
+        }
+
+        [TestMethod]
+        public void TestContainsAny_NotEmpty_ContainsNone()
+        {
+            const int MAX = 20;
+            int[] sample = FrequencyTableTest._Sample(10, MAX, out Dictionary<int, int> dictionary);
+            this._Table[MAX] = MAX;
+            Assert.IsFalse(this._Table.ContainsAny(sample));
+            this._AssertProperties(MAX, 1, MAX, MAX);
+        }
+
+        [TestMethod]
+        public void TestContainsAny_Null() => Assert.ThrowsException<ArgumentNullException>(() => this._Table.ContainsAny(null));
+#endregion
+
 #region CopyTo tests
 #region Generic tests
 #region CopyTo(T) tests

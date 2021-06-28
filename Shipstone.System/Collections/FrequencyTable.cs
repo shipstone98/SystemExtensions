@@ -423,6 +423,25 @@ namespace Shipstone.System.Collections
             return true;
         }
 
+        /// <summary>
+        /// Determines whether at least one of the items contained in the specified collection are in the <see cref="FrequencyTable{T}" />.
+        /// </summary>
+        /// <param name="collection">The collection to locate one or more items from in the <see cref="FrequencyTable{T}" />. The collection itself cannot be <c>null</c>, but it can contain items that are <c>null</c>, if <c><typeparamref name="T" /></c> is a reference type.</param>
+        /// <returns><c>true</c> if one or more items in <c><paramref name="collection" /></c> are found in the <see cref="FrequencyTable{T}" />; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="collection" /></c> is <c>null</c>.</exception>
+        public bool ContainsAny(IEnumerable<T> collection)
+        {
+            foreach (T item in collection ?? throw new ArgumentNullException(nameof (collection)))
+            {
+                if (this._Items.Contains(item))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 #region CopyTo methods
         /// <summary>
         /// Copies the entire <see cref="FrequencyTable{T}" /> to a compatible one-dimensional array, starting at the beginning of the target array.
