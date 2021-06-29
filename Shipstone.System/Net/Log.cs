@@ -1,5 +1,7 @@
 using System;
 using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Shipstone.System.Net
 {
@@ -68,23 +70,35 @@ namespace Shipstone.System.Net
         /// <param name="status">The <see cref="HttpStatusCode" /> returned to the client.</param>
         /// <param name="bytes">The size of the object returned to the client, measured in bytes.</param>
         /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="bytes" /></c> is less than 0.</exception>
-        public Log(String host, String identity, String authUser, String request, HttpStatusCode status, int bytes)
+        public Log(String host, String identity, String authUser, String request, HttpStatusCode status, int bytes) : this(host, identity, authUser, DateTime.Now, request, status, bytes) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Log" /> structure containing the specified fields and timestamp.
+        /// </summary>
+        /// <param name="host">The IP address of the remote client which made the request.</param>
+        /// <param name="identity">The RFC 1413 identity of the client. This is usually <c>null</c>.</param>
+        /// <param name="authUser">The ID of the user requesting the resource.</param>
+        /// <param name="date">The timestamp at the time the request was received.</param>
+        /// <param name="request">The request from the client.</param>
+        /// <param name="status">The <see cref="HttpStatusCode" /> returned to the client.</param>
+        /// <param name="bytes">The size of the object returned to the client, measured in bytes.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><c><paramref name="bytes" /></c> is less than 0.</exception>
+        public Log(String host, String identity, String authUser, DateTime date, String request, HttpStatusCode status, int bytes)
         {
             if (bytes < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof (bytes));
             }
 
-            DateTime utcNow = DateTime.UtcNow;
             this._HashCode = 0;
             this.AuthUser = String.IsNullOrWhiteSpace(authUser) ? null : authUser;
             this.Bytes = bytes;
-            this.Date = utcNow.ToLocalTime();
+            this.Date = date;
             this.Host = String.IsNullOrWhiteSpace(host) ? null : host;
             this.Identity = String.IsNullOrWhiteSpace(identity) ? null : identity;
             this.Request = request;
             this.Status = status;
-            this.UtcDate = utcNow;
+            this.UtcDate = date.ToUniversalTime();
             this._HashCode = this.GetHashCode();
         }
 
@@ -135,8 +149,51 @@ namespace Shipstone.System.Net
             return this._HashCode;
         }
 
-        public override String ToString() => throw new NotImplementedException();
-        public String ToString(String dateFormat) => throw new NotImplementedException();
+        /// <summary>
+        /// Returns the string representation of the current <see cref="Log" /> object using the default timestamp formatting.
+        /// </summary>
+        /// <returns>A string representation of the current <see cref="Log" /> object.</returns>
+        public override String ToString() => this.ToString(null);
+
+        /// <summary>
+        /// Returns the string representation of the current <see cref="Log" /> object using the specified timestamp formatting.
+        /// </summary>
+        /// <param name="dateFormat">A standard or custom date and time format string, or <c>null</c> to use the default.</param>
+        /// <returns>A string representation of the current <see cref="Log" /> object.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">The date and time is outside the range of dates supported by the calendar used by the current culture.</exception>
+        /// <exception cref="FormatException">The length of <c><paramref name="dateFormat" /></c> is 1, and it is not one of the format specified characters defined for <see cref="System.Globalization.DateTimeFormatInfo" /> -or- <c><paramref name="dateFormat" /></c> does not contain a valid custom format pattern.</exception>
+        public String ToString(String dateFormat)
+        {
+            const String DEFAULT_FORMAT = "dd/MMM/yyyy HH:mm:ss zzz";
+            const String NULL_PLACEHOLDER = "-";
+            StringBuilder sb = new StringBuilder();
+            sb.Append(this.Host ?? NULL_PLACEHOLDER);
+            sb.Append(' ');
+            sb.Append(this.Identity ?? NULL_PLACEHOLDER);
+            sb.Append(' ');
+            sb.Append(this.AuthUser ?? NULL_PLACEHOLDER);
+            sb.Append(" [");
+            sb.Append(this.Date.ToString(dateFormat ?? DEFAULT_FORMAT));
+            sb.Append("] ");
+
+            if (this.Request is null)
+            {
+                sb.Append(NULL_PLACEHOLDER);
+            }
+
+            else
+            {
+                sb.Append('"');
+                sb.Append(Regex.Replace(this.Request, @"\s+", " "));
+                sb.Append('"');
+            }
+
+            sb.Append(' ');
+            sb.Append((int) this.Status);
+            sb.Append(' ');
+            sb.Append(this.Bytes);
+            return sb.ToString();
+        }
 
         public static Log Parse(String s) => throw new NotImplementedException();
 
