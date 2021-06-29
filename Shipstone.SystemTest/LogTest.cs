@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Shipstone.System.Net;
@@ -61,6 +62,24 @@ namespace Shipstone.SystemTest
         }
 
         [TestMethod]
+        public void TestParse_Valid()
+        {
+            Log expected = new Log(LogTest._DefaultHost, LogTest._DefaultIdentity, LogTest._DefaultAuthUser, DateTime.UnixEpoch, LogTest._DefaultRequest, LogTest._DefaultStatus, LogTest._DefaultBytes);
+            Log actual = Log.Parse(expected.ToString());
+            Assert.AreEqual(expected.AuthUser, actual.AuthUser);
+            Assert.AreEqual(expected.Bytes, actual.Bytes);
+            Assert.AreEqual(expected.Date, actual.Date);
+            Assert.AreEqual(expected.Host, actual.Host);
+            Assert.AreEqual(expected.Identity, actual.Identity);
+            Assert.AreEqual(Regex.Replace(expected.Request, @"\s+", " "), actual.Request);
+            Assert.AreEqual(expected.Status, actual.Status);
+            Assert.AreEqual(expected.UtcDate, actual.UtcDate);
+        }
+
+        [TestMethod]
+        public void TestParse_Null() => Assert.ThrowsException<ArgumentNullException>(() => Log.Parse(null));
+
+        [TestMethod]
         public void TestToString()
         {
             Log log = new Log(LogTest._DefaultHost, LogTest._DefaultIdentity, LogTest._DefaultAuthUser, DateTime.UnixEpoch, LogTest._DefaultRequest, LogTest._DefaultStatus, LogTest._DefaultBytes);
@@ -71,6 +90,7 @@ namespace Shipstone.SystemTest
         public void TestToString_Null()
         {
             Log log = new Log(LogTest._DefaultHost, LogTest._DefaultIdentity, LogTest._DefaultAuthUser, DateTime.UnixEpoch, LogTest._DefaultRequest, LogTest._DefaultStatus, LogTest._DefaultBytes);
-            Assert.AreEqual($"localhost - chris [01/Jan/1970 00:00:00 +00:00] \"GET /index.html \" 200 4", log.ToString(null));}
+            Assert.AreEqual($"localhost - chris [01/Jan/1970 00:00:00 +00:00] \"GET /index.html \" 200 4", log.ToString(null));
+        }
     }
 }

@@ -195,7 +195,100 @@ namespace Shipstone.System.Net
             return sb.ToString();
         }
 
-        public static Log Parse(String s) => throw new NotImplementedException();
+        private static String GetToken(ref String str)
+        {
+            int index = str.IndexOf(' ');
+            String substring;
+
+            if (index == -1)
+            {
+                substring = str;
+                str = String.Empty;
+            }
+
+            else
+            {
+                substring = str.Substring(0, index);
+                str = str.Remove(0, index).TrimStart();
+            }
+
+            return substring == "-" ? null : substring;
+        }
+
+        /// <summary>
+        /// Converts the string representation of a server log to an equivalent <see cref="Log" /> object.
+        /// </summary>
+        /// <param name="str">A string containing the server log to convert.</param>
+        /// <returns>A <see cref="Log" /> instance whose value is represented by <c><paramref name="str" /></c>.</returns>
+        /// <exception cref="ArgumentNullException"><c><paramref name="str" /></c> is <c>null</c>.</exception>
+        /// <exception cref="FormatException"><c><paramref name="str" /></c> is not in the correct format.</exception>
+        public static Log Parse(String str)
+        {
+            if (str is null)
+            {
+                throw new ArgumentNullException(nameof (str));
+            }
+
+            try
+            {
+                str.TrimStart();
+                String host = Log.GetToken(ref str);
+                String ident = Log.GetToken(ref str);
+                String authUser = Log.GetToken(ref str);
+
+                if (str[0] != '[')
+                {
+                    throw new Exception();
+                }
+
+                str = str.Remove(0, 1);
+                int index = str.IndexOf(']');
+
+                if (index == -1)
+                {
+                    throw new Exception();
+                }
+
+                String dateString = str.Substring(0, index);
+                str = str.Remove(0, index + 1).TrimStart();
+                DateTime date = DateTime.Parse(dateString);
+
+                if (str[0] != '"')
+                {
+                    throw new Exception();
+                }
+
+                str = str.Remove(0, 1);
+
+                if ((index = str.IndexOf('"', 1)) == -1)
+                {
+                    throw new Exception();
+                }
+                
+                String request = str.Substring(0, index);
+                str = str.Remove(0, index + 1).TrimStart();
+                HttpStatusCode status = (HttpStatusCode) Int32.Parse(Log.GetToken(ref str));
+
+                if (!Enum.IsDefined(typeof (HttpStatusCode), status))
+                {
+                    throw new Exception();
+                }
+
+                int bytes = Int32.Parse(Log.GetToken(ref str));
+                
+                if (!String.IsNullOrWhiteSpace(str))
+                {
+                    throw new Exception();
+                }
+
+                return new Log(host, ident, authUser, date, request, status, bytes);
+            }
+
+            catch
+            {
+                throw new FormatException($"{nameof (str)} is not in the correct format.");
+            }
+        }
 
         /// <summary>
         /// Determines whether two specified <see cref="Log" /> instances have the same value.
