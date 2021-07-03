@@ -7,7 +7,7 @@ using Shipstone.System.Collections;
 namespace Shipstone.System.Numerics
 {
     /// <summary>
-    /// Provides static methods for common mathematical and statistical functions.
+    /// Provides <c>static</c> (<c>Shared</c> in Visual Basic) methods for common mathematical and statistical functions.
     /// </summary>
     public static class MathExtensions
     {
