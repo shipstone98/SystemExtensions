@@ -43,6 +43,7 @@ Extension classes to .NET Standard 2.0.
 - public void Clear(): removes all items from the FrequencyTable<T>
 - public bool Contains(T item): determines whether an item is in the FrequencyTable<T>
 - public bool ContainsAll(IEnumerable<T> collection): determines whether all items contained in the specified collection are in the FrequencyTable<T>
+- public bool ContainsAny(IEnumerable<T> collection): determines whether at least one of the items contained in the specified collection are in the FrequencyTable<T>.
 - public void CopyTo(T[] array): copies the entire FrequencyTable<T> to a compatible one-dimensional array, starting at the beginning of the target array
 - public void CopyTo(T[] array, int arrayIndex): copies the entire FrequencyTable<T> to a compatible one-dimensional array, starting at the specified index of the target array
 - public void CopyTo(T[] array, int arrayIndex, int frequency): copies the a range of items from the FrequencyTable<T> with the specified frequency to a compatible one-dimensional array, starting at the specified index of the target array
