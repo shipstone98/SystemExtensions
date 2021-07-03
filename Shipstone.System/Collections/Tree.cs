@@ -41,7 +41,8 @@ namespace Shipstone.System.Collections
             this.Root.Tree = this;
         }
 
-        public Tree(IEnumerator<T> collection) => throw new NotImplementedException();
+        public Tree(T rootValue, IEnumerable<T> collection) => throw new NotImplementedException();
+        public Tree(T rootValue, IEnumerable<TreeBranch<T>> collection) => throw new NotImplementedException();
         public Tree(TreeBranch<T> root) => throw new NotImplementedException();
         public Tree(Tree<T> tree) => throw new NotImplementedException();
 
